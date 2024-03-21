@@ -8,3 +8,6 @@ def hello_world():
 
 if __name__ == "__main__":
     app.run()
+
+
+# app.py contains your Flask application code, including route definitions, database connections, and any other application setup.
