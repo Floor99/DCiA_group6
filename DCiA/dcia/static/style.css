@@ -73,3 +73,37 @@ footer .form-control {
 .footer .nav-link:focus {
   border-bottom: none;
 }
+
+
+
+.team-member-photo {
+  width: 200px; /* Set a fixed width */
+  height: 200px; /* Set a fixed height */
+  object-fit: cover; /* This will cover the area without distorting the aspect ratio */
+  border-radius: 50%; /* Optional: if you want round images */
+}
+
+
+
+
+
+.pricing-card {
+  border: 1px solid #cccccc; /* Light grey border */
+  /* ...other styles... */
+}
+
+.pricing .price {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+
+.pricing .price {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+/* Ensure that all cards on the same row are the same height */
+.row {
+  display: flex;
+}

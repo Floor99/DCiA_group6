@@ -11,13 +11,13 @@ def index():
 def sign_in():
     return render_template('sign_in.html')
 
-@app.route('/grant_application')
-def grant_application():
+@app.route('/grant_applications')
+def grant_applications():
     return render_template('grant_applications.html')
 
-@app.route('/publications')
-def publications():
-    return render_template('publications.html')
+@app.route('/co_authorship')
+def co_authorship():
+    return render_template('co_authorship.html')
 
 @app.route('/knowledge_sharing')
 def knowledge_sharing():

@@ -1,1 +1,77 @@
-<h1>Team</h1>
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-3">Our Team</h2>
+  <p>Meet the team behind Knowledge Networks – a dedicated group from JADS, collaborating with Apollo Health Innovations to bring valuable insights into knowledge sharing within academic institutions.</p>
+
+  <!-- Team Member Profiles -->
+  <div class="row text-center">
+    <!-- Floor Halkes -->
+    <div class="col-md-4 mb-4">
+      <div class="card border-0">
+        <img src="{{ url_for('static', filename='floor.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Floor Halkes">
+        <div class="card-body">
+          <h5 class="card-title">Floor Halkes</h5>
+          <p class="card-text">SCRUM Master with a background in Engineering Policy Analysis and Management from TU Delft. Passionate about consultancy and network analysis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edde Jansen -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 border-0">
+        <img src="{{ url_for('static', filename='edde.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Edde Jansen">
+        <div class="card-body">
+          <h5 class="card-title">Edde Jansen</h5>
+          <p class="card-text">Product Owner who studied social sciences focusing on public health, political economy, and sustainable development.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eva Haverkort -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 border-0">
+        <img src="{{ url_for('static', filename='eva.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Eva Haverkort">
+        <div class="card-body">
+          <h5 class="card-title">Eva Haverkort</h5>
+          <p class="card-text">Product Developer with a focus on public health and data intersection, bringing technical expertise to tackle complex challenges.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kyra Jongman -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 border-0">
+        <img src="{{ url_for('static', filename='kyra.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Kyra Jongman">
+        <div class="card-body">
+          <h5 class="card-title">Kyra Jongman</h5>
+          <p class="card-text">Product Developer with skills in ICT & Business, eager to apply her technical knowledge and problem-solving skills.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marijn van Houwelingen -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 border-0">
+        <img src="{{ url_for('static', filename='marijn.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Marijn van Houwelingen">
+        <div class="card-body">
+          <h5 class="card-title">Marijn van Houwelingen</h5>
+          <p class="card-text">Product Developer with a background in Business Economics, excited about solving social network challenges.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Niels Boonstra -->
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 border-0">
+        <img src="{{ url_for('static', filename='niels.png') }}" class="card-img-top team-member-photo mx-auto d-block" alt="Niels Boonstra">
+        <div class="card-body">
+          <h5 class="card-title">Niels Boonstra</h5>
+          <p class="card-text">Product Developer with a strong foundation in computer science and data science, looking to leverage his knowledge in practical applications.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

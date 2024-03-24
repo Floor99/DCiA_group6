@@ -1,9 +1,8 @@
-<h1>Knowledge sharing</h1>
 {% extends 'layout.html' %}
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center my-4">Knowledge Sharing</h1>
+    <h1 class="text-center my-4">Co-authorship</h1>
     <p>This network shows the articles and authors in your organization. Blue nodes represent people and grey nodes represent a paper/publication. The blue edges connect two authors if they have worked together on a publication, the grey lines connect the authors to the publications they have worked on. The thicker the line between two authors the more publications they have worked on together.</p>
     <div class="row my-4">
         <div class="col-md-4">
@@ -21,7 +20,7 @@
             <button class="btn btn-secondary">Load new data</button>
         </div>
         <div class="col-md-8">
-            <img src="{{ url_for('static', filename='network_example_image.png') }}" class="img-fluid" alt="Knowledge Sharing Network">
+            <img src="{{ url_for('static', filename='network_example_image.png') }}" class="img-fluid" alt="Co-authorship Network">
             <div class="text-end">
                 <button class="btn btn-outline-secondary mt-2">Export figure</button>
             </div>

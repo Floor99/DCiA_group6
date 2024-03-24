@@ -1,1 +1,47 @@
-<h1>faqs</h1>
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>FAQs</h2>
+
+  <div class="accordion" id="faqAccordion">
+    <!-- About Network Analysis Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingNetworkAnalysis">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNetworkAnalysis" aria-expanded="true" aria-controls="collapseNetworkAnalysis">
+          About network analysis
+        </button>
+      </h2>
+      <div id="collapseNetworkAnalysis" class="accordion-collapse collapse show" aria-labelledby="headingNetworkAnalysis" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          <strong>What is network analysis?</strong>
+          <p>Network analysis is the mathematical analysis of complex working procedures in terms of a network of related activities.</p>
+          <strong>What is centrality?</strong>
+          <p>Centrality measures help identify the most important vertices within a graph. For example, individuals with high levels of centrality within a social network might be those with the most influence or connections within the network.</p>
+          <strong>What is an edge/node attribute?</strong>
+          <p>Edge attributes refer to the properties associated with the relationships between nodes, while node attributes refer to the properties of the individual nodes within the network.</p>
+        </div>
+      </div>
+    </div>
+    <!-- About Pricing Section -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingPricing">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePricing" aria-expanded="false" aria-controls="collapsePricing">
+          About pricing
+        </button>
+      </h2>
+      <div id="collapsePricing" class="accordion-collapse collapse" aria-labelledby="headingPricing" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          <strong>How much does a network analysis for my institution cost?</strong>
+          <p>A network analysis of knowledge sharing in your institution is invaluable, so we don't think you can really put a price tag on that. Contact us for more info!</p>
+          <strong>Do I pay extra if my data is updated?</strong>
+          <p>Updates to your data within predefined intervals are included in your initial cost. Additional updates may incur further charges depending on the frequency and the volume of data.</p>
+          <strong>How many accounts do I get?</strong>
+          <p>The number of accounts will be based on the package you choose, with options ranging from individual accounts to institution-wide access.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+<br>
+</div>
+{% endblock %}
