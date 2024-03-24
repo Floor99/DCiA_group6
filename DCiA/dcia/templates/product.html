@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Product Information</h2>
+
+  <p>Welcome to Knowledge Networks. Our product is designed to enhance the collaborative efforts within academic institutions by utilizing advanced network analysis techniques. We provide valuable insights into the dynamics of knowledge sharing, facilitating a more integrated and efficient academic environment.</p>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <h3>Features</h3>
+      <ul>
+        <li>Comprehensive network visualization tools</li>
+        <li>Insightful analytics for identifying key influencers</li>
+        <li>Collaborative platforms for academic discussion</li>
+        <li>User-friendly interface for both technical and non-technical users</li>
+      </ul>
+    </div>
+    <div class="col-lg-6">
+      <h3>Benefits</h3>
+      <ul>
+        <li>Streamlines the research collaboration process</li>
+        <li>Uncovers hidden patterns in academic partnerships</li>
+        <li>Encourages cross-disciplinary interaction</li>
+        <li>Supports strategic decision-making</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-lg-12">
+      <h3>How It Works</h3>
+      <p>Our platform leverages data-driven techniques to map out the connections within your institution. By analyzing publication data, project collaborations, and other relevant metrics, Knowledge Networks can help you understand and optimize the flow of knowledge among your faculty and staff.</p>
+    </div>
+  </div>
+
+  <!-- Call to Action -->
+  <div class="row mt-5">
+    <div class="col-lg-12 text-center">
+      <a href="{{ url_for('contact') }}" class="btn btn-secondary">Request a Demo</a>
+    </div>
+  </div>
+  <br>
+</div>
+{% endblock %}

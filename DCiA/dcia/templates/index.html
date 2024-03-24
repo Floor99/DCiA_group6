@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}Knowledge Networks{% endblock %}
+
+{% block content %}
+<div class="header text-center">
+  <h1>Welcome to Knowledge Networks</h1>
+  <p class="lead">A guide to using network visualisation and analysis to understand and improve knowledge sharing in academic institutions.</p>
+  <a href="{{url_for ('about')}}" class="btn btn-dark">Learn More</a>
+</div>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <img src="{{ url_for('static', filename='network_example_image.png') }}" class="card-img-top" alt="Co-authorship Network">
+        <div class="card-body">
+          <h5 class="card-title">Co-authorship</h5>
+          <p class="card-text">Learn where communities of authors exist, learn where to intervene to increase knowledge sharing and collaboration based on co-authorship relationships.</p>
+          <a href="{{url_for('co_authorship')}}" class="btn btn-outline-dark">Go to network</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <img src="{{ url_for('static', filename='network_example_image.png') }}" class="card-img-top" alt="Grant Application Network">
+        <div class="card-body">
+          <h5 class="card-title">Grant application</h5>
+          <p class="card-text">Find out what individuals apply for grants together and gain insight into which persons are important in connecting researching together.</p>
+          <a href="{{url_for('grant_applications')}}" class="btn btn-outline-dark">Go to network</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <img src="{{ url_for('static', filename='network_example_image.png') }}" class="card-img-top" alt="Co-authorship Network">
+        <div class="card-body">
+          <h5 class="card-title">Knowledge sharing</h5>
+          <p class="card-text">Learn where communities of authors exist, learn where to intervene to increase knowledge sharing and collaboration based on co-authorship relationships.</p>
+          <a href="{{url_for('knowledge_sharing')}}" class="btn btn-outline-dark">Go to network</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <img src="{{ url_for('static', filename='network_example_image.png') }}" class="card-img-top" alt="Grant Application Network">
+        <div class="card-body">
+          <h5 class="card-title">Cross-institutional</h5>
+          <p class="card-text">Find out what individuals apply for grants together and gain insight into which persons are important in connecting researching together.</p>
+          <a href="#" class="btn btn-outline-dark">Coming soon...</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

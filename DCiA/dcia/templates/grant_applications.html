@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center my-4">Grant-applications</h1>
+    <p>This network shows the articles and authors in your organization. Blue nodes represent people and grey nodes represent a paper/publication. The blue edges connect two authors if they have worked together on a publication, the grey lines connect the authors to the publications they have worked on. The thicker the line between two authors the more publications they have worked on together.</p>
+    <div class="row my-4">
+        <div class="col-md-4">
+            <h3>Filters</h3>
+            <form>
+                <div class="mb-3">
+                    <label for="yearFilter" class="form-label">Year</label>
+                    <select class="form-select" id="yearFilter">
+                        <option selected>Dropdown years</option>
+                        <!-- Add year options here -->
+                    </select>
+                </div>
+                <!-- Repeat for other filters -->
+            </form>
+            <button class="btn btn-secondary">Load new data</button>
+        </div>
+        <div class="col-md-8">
+            <img src="{{ url_for('static', filename='network_example_image.png') }}" class="img-fluid" alt="Grant-applications Network">
+            <div class="text-end">
+                <button class="btn btn-outline-secondary mt-2">Export figure</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Network statistics</h5>
+                    <p class="card-text">Community detection: Some information about community detection in the given network.</p>
+                    <a href="#" class="btn btn-secondary">Show top 5 communities</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Bridge detection</h5>
+                    <p class="card-text">Some information about bridge detection in the given network.</p>
+                    <a href="#" class="btn btn-secondary">Show most important bridgers</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Additional cards for Centrality measures and Attribute specifications -->
+    </div>
+</div>
+{% endblock %}

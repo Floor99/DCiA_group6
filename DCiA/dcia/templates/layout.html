@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Knowledge Networks{% endblock %}</title>
+    <!-- Bootstrap CSS, assuming you are using Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<div class = "content">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{url_for('index')}}">KnowledgeNetworks</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('about') }}">About KnowledgeNetworks</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('faqs') }}">FAQs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('sign_in') }}">Sign In</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main role="main" class="container mt-3">
+      {% block content %}
+      <!-- The unique content of each page will go here -->
+      {% endblock %}
+  </main>
+</div>
+
+<footer class="footer">
+  <div class="container">
+      <div class="row justify-content-end">
+          <div class="col-md-5 text-end">
+              <h5><i class="fas fa-project-diagram"></i> KnowledgeNetworks </h5>
+              <div class="row">
+                  <div class="col-6">
+                      <ul class="list-unstyled">
+                          <li><a href="{{ url_for('mission') }}">Mission</a></li>
+                          <li><a href="{{ url_for('team') }}">Team</a></li>
+                          <li><a href="{{ url_for('product') }}">Product</a></li>
+                          <li><a href="{{ url_for('documentation') }}">Documentation</a></li>
+                      </ul>
+                  </div>
+                  <div class="col-6">
+                      <ul class="list-unstyled">
+                          <li><a href="{{ url_for('about') }}">About</a></li>
+                          <li><a href="{{ url_for('pricing') }}">Pricing</a></li>
+                          <li><a href="{{ url_for('faqs') }}">FAQs</a></li>
+                          <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="row justify-content-end">
+                <div class="col-auto text-end">
+                  <ul class="nav">
+                    <li class="nav-item"><a href="https://www.facebook.com/apollo.hi.hq/" class="nav-link pl-0"><i class="fab fa-facebook-f fa-lg"></i></a></li>
+                    <li class="nav-item"><a href="https://twitter.com/AHI_HQ" class="nav-link"><i class="fab fa-twitter fa-lg"></i></a></li>
+                    <li class="nav-item"><a href="https://github.com/Floor99/DCiA_group6" class="nav-link"><i class="fab fa-github fa-lg"></i></a></li>
+                    <li class="nav-item"><a href="https://www.instagram.com/apollohi_hq/" class="nav-link"><i class="fab fa-instagram fa-lg"></i></a></li>
+                  </ul>
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</footer>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

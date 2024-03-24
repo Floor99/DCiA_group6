@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-left mb-4">Pricing</h2>
+
+  <div class="row">
+    <!-- Pricing Card 1 -->
+    <div class="col-md-4 d-flex align-items-stretch">
+      <div class="card text-center mb-4" style="width: 18rem;">
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title">Plan 1</h4>
+          <p class="card-text">
+            <strong>Single network analysis</strong>
+          </p>
+          <p class="pricing"><span class="price">$5</span> per month</p>
+          <ul class="list-unstyled">
+            <li>Network visualisation</li>
+            <li>Network tools</li>
+            <li>Network Statistics</li>
+          </ul>
+          <a href="#" class="btn btn-secondary mt-auto">Select</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Card 2 -->
+    <div class="col-md-4 d-flex align-items-stretch">
+      <div class="card text-center mb-4" style="width: 18rem;">
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title">Plan 2</h4>
+          <p class="card-text">
+            <strong>Multiple network analysis</strong>
+          </p>
+          <p class="pricing"><span class="price">$10</span> per month</p>
+          <ul class="list-unstyled">
+            <li>Network visualisation for multiple datasets</li>
+            <li>Network tools for multiple datasets</li>
+            <li>Network statistics for multiple datasets</li>
+          </ul>
+          <a href="#" class="btn btn-secondary mt-auto">Select</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Card 3 -->
+    <div class="col-md-4 d-flex align-items-stretch">
+      <div class="card text-center mb-4" style="width: 18rem;">
+        <div class="card-body d-flex flex-column">
+          <h4 class="card-title">Plan 3</h4>
+          <p class="card-text">
+            <strong>Multiple updated network analysis</strong>
+          </p>
+          <p class="pricing"><span class="price">$20</span> per month</p>
+          <ul class="list-unstyled">
+            <li>Network visualisation for multiple datasets with updates</li>
+            <li>Network tools for multiple datasets with updates</li>
+            <li>Network statistics for multiple datasets with updates</li>
+          </ul>
+          <a href="#" class="btn btn-secondary mt-auto">Select</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
