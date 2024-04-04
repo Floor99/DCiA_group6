@@ -57,7 +57,7 @@ def visualization(csv,attribute_csv,attribute_csv2):
                 } for i in range(len(attribute_csv_empty))]
     
     
-    #copy paste because it's I'm lazy
+    #copy paste
     if isinstance(attribute_csv2, pd.DataFrame):
         #remove nodes without edges and insert the nodes and edges into a dataset readable by the network generator
         attribute_csv_empty2 = attribute_csv2[attribute_csv2['Node'].isin(Edge_df['from']) | attribute_csv2['Node'].isin(Edge_df['to'])].reset_index()
