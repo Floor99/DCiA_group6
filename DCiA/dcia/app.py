@@ -1,6 +1,5 @@
 from flask import Flask, render_template
-
-
+#run this app to run only the website
 app = Flask(__name__)
 
 @app.route("/")
@@ -56,7 +55,7 @@ def contact():
     return render_template('contact.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
 
 
 # app.py contains your Flask application code, including route definitions, database connections, and any other application setup.
