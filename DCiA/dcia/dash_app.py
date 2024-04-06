@@ -1,7 +1,7 @@
 from dash import Dash
 import dash_cytoscape as cyto
-from visualisation import visualization
-from load_data import load_data
+from dcia.f_visualisation import visualization
+from dcia.f_load_data import load_data
 cyto.load_extra_layouts()
 
 app = Dash(__name__)

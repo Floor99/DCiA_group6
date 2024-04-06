@@ -1,25 +1,25 @@
-from color_functions import interpolate_color, number_to_rgb_gradient
+from dcia.f_colors import interpolate_color, number_to_rgb_gradient
 import pandas as pd
 from dash import Dash, html
 import dash_cytoscape as cyto
 
 def visualization(csv,attribute_csv,attribute_csv2):
     #drop the duplicates and edges to themselves
-    Edge_df=csv.drop_duplicates(keep="first").reset_index(drop=True)
-    Edge_df = Edge_df[Edge_df['from'] != Edge_df['to']].reset_index(drop=True)
+    edge_df=csv.drop_duplicates(keep="first").reset_index(drop=True)
+    edge_df = edge_df[edge_df['from'] != edge_df['to']].reset_index(drop=True)
 
     #remove nodes without edges and insert the nodes and edges into a dataset readable by the network generator
-    attribute_csv_empty = attribute_csv[attribute_csv['Node'].isin(Edge_df['from']) | attribute_csv['Node'].isin(Edge_df['to'])].reset_index()
+    attribute_csv_empty = attribute_csv[attribute_csv['Node'].isin(edge_df['from']) | attribute_csv['Node'].isin(edge_df['to'])].reset_index()
     for i in range(len(attribute_csv_empty)):
-        attribute_csv_empty.loc[i, 'Count'] = len(Edge_df[Edge_df.to == attribute_csv_empty.loc[i,'Node']])
-        attribute_csv_empty.loc[i, 'Count'] = attribute_csv_empty.loc[i, 'Count']+len(Edge_df[Edge_df['from'] == attribute_csv_empty.loc[i,'Node']])
+        attribute_csv_empty.loc[i, 'Count'] = len(edge_df[edge_df.to == attribute_csv_empty.loc[i,'Node']])
+        attribute_csv_empty.loc[i, 'Count'] = attribute_csv_empty.loc[i, 'Count']+len(edge_df[edge_df['from'] == attribute_csv_empty.loc[i,'Node']])
 
     min_val = min(attribute_csv_empty['Count'])
     max_val = max(attribute_csv_empty['Count'])
 
     # Convert each number to RGB gradient
     rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,1) for num in attribute_csv_empty['Count']]
-    attribute_csv_empty['gradient']=rgb_gradients
+    attribute_csv_empty['gradient'] = rgb_gradients
     #adds the nodes
     nodes = [{
                 "data": {"id": str(attribute_csv_empty.loc[i, "Node"]),
@@ -32,18 +32,18 @@ def visualization(csv,attribute_csv,attribute_csv2):
     #copy paste
     if isinstance(attribute_csv2, pd.DataFrame):
         #remove nodes without edges and insert the nodes and edges into a dataset readable by the network generator
-        attribute_csv_empty2 = attribute_csv2[attribute_csv2['Node'].isin(Edge_df['from']) | attribute_csv2['Node'].isin(Edge_df['to'])].reset_index()
+        attribute_csv_empty2 = attribute_csv2[attribute_csv2['Node'].isin(edge_df['from']) | attribute_csv2['Node'].isin(edge_df['to'])].reset_index()
 
         for i in range(len(attribute_csv_empty2)):
-            attribute_csv_empty2.loc[i, 'Count'] = len(Edge_df[Edge_df.to == attribute_csv_empty2.loc[i,'Node']])
-            attribute_csv_empty2.loc[i, 'Count'] = attribute_csv_empty2.loc[i, 'Count']+len(Edge_df[Edge_df['from'] == attribute_csv_empty2.loc[i,'Node']])
+            attribute_csv_empty2.loc[i, 'Count'] = len(edge_df[edge_df.to == attribute_csv_empty2.loc[i,'Node']])
+            attribute_csv_empty2.loc[i, 'Count'] = attribute_csv_empty2.loc[i, 'Count']+len(edge_df[edge_df['from'] == attribute_csv_empty2.loc[i,'Node']])
 
         min_val = min(attribute_csv_empty2['Count'])
         max_val = max(attribute_csv_empty2['Count'])
 
         # Convert each number to RGB gradient
         rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,2) for num in attribute_csv_empty2['Count']]
-        attribute_csv_empty2['gradient']=rgb_gradients
+        attribute_csv_empty2['gradient'] = rgb_gradients
 
         #adds the nodes from the different csv in a different colour
         nodes2 = [{
@@ -59,13 +59,13 @@ def visualization(csv,attribute_csv,attribute_csv2):
     edges = [
         {
         "data": {
-            "source": str(Edge_df.loc[j, "from"]),
-            "target": str(Edge_df.loc[j, "to"]),
-            'label': attribute_csv_empty.loc[Edge_df.loc[j, "from"],str(attribute_csv_empty.columns[2])],
+            "source": str(edge_df.loc[j, "from"]),
+            "target": str(edge_df.loc[j, "to"]),
+            'label': attribute_csv_empty.loc[edge_df.loc[j, "from"],str(attribute_csv_empty.columns[2])],
 
             }
         }
-        for j in range(len(Edge_df))
+        for j in range(len(edge_df))
     ]
     #combines the data into a cytoscape objects
     default_elements = nodes + edges
