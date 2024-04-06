@@ -1,4 +1,4 @@
-# DCiA_group6
+# DCiA_group6 - Please merge cleanup pr before pulling main 
 
 Run the app: navigate to app.py and run the script in the terminal. Follow the link provided (e.g. http://127.0.0.1:5000/).
 
