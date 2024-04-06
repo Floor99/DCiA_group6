@@ -1,4 +1,7 @@
 from flask import Flask, render_template
+from flask import Flask, send_file
+from construct_graph import export_graph_to_image
+
 #run this app to run only the website
 app = Flask(__name__)
 
@@ -53,6 +56,15 @@ def faqs():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+# Route to handle the export request
+@app.route("/export-graph", methods=["GET"])
+def export_graph():
+    filename = "exported_graph.png"
+    # Call the function to export the graph as an image
+    export_graph_to_image(filename)  # Provide graph_data if needed
+    return send_file(filename, as_attachment=True)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

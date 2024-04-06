@@ -2,14 +2,15 @@
 import pandas as pd
 from dash import Dash, html
 import dash_cytoscape as cyto
+import plotly.io as pio
 cyto.load_extra_layouts()
 
-#run this app to run only the website
+# run this app to run only the network visualisation
 app = Dash(__name__)
 
 
 
-#load colors for the nodes 
+#load colors for the nodes
 def interpolate_color(color1, color2, factor):
     """ Interpolate between two RGB colors """
     r = int(color1[0] * (1 - factor) + color2[0] * factor)
@@ -23,19 +24,19 @@ def number_to_rgb_gradient(number, min_val, max_val,csv):
     if csv==1:
         color1 = (255,255,204)  # Lightest color (white)
         color2 = (255,0,0)  # Brightest color (red)
-        
+
     if csv==2:
         color1 = (240,248,255) # Lightest color (blue)
-        color2 = (0, 2, 29)  # Brightest color (dark blue)    
+        color2 = (0, 2, 29)  # Brightest color (dark blue)
     return interpolate_color(color1, color2, normalized_value)
 
 
-    
+
 def visualization(csv,attribute_csv,attribute_csv2):
     #drop the duplicates and edges to themselves
     Edge_df=csv.drop_duplicates(keep="first").reset_index(drop=True)
     Edge_df = Edge_df[Edge_df['from'] != Edge_df['to']].reset_index(drop=True)
-    
+
     #remove nodes without edges and insert the nodes and edges into a dataset readable by the network generator
     attribute_csv_empty = attribute_csv[attribute_csv['Node'].isin(Edge_df['from']) | attribute_csv['Node'].isin(Edge_df['to'])].reset_index()
     for i in range(len(attribute_csv_empty)):
@@ -44,45 +45,45 @@ def visualization(csv,attribute_csv,attribute_csv2):
 
     min_val = min(attribute_csv_empty['Count'])
     max_val = max(attribute_csv_empty['Count'])
-        
+
     # Convert each number to RGB gradient
     rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,1) for num in attribute_csv_empty['Count']]
     attribute_csv_empty['gradient']=rgb_gradients
     #adds the nodes
     nodes = [{
-                "data": {"id": str(attribute_csv_empty.loc[i, "Node"]), 
+                "data": {"id": str(attribute_csv_empty.loc[i, "Node"]),
                        "label": str(attribute_csv_empty.loc[i, "Node"]),
                        'color': 'rgb'+str(attribute_csv_empty.loc[i, "gradient"])
                        }
                 } for i in range(len(attribute_csv_empty))]
-    
-    
+
+
     #copy paste
     if isinstance(attribute_csv2, pd.DataFrame):
         #remove nodes without edges and insert the nodes and edges into a dataset readable by the network generator
         attribute_csv_empty2 = attribute_csv2[attribute_csv2['Node'].isin(Edge_df['from']) | attribute_csv2['Node'].isin(Edge_df['to'])].reset_index()
-        
+
         for i in range(len(attribute_csv_empty2)):
             attribute_csv_empty2.loc[i, 'Count'] = len(Edge_df[Edge_df.to == attribute_csv_empty2.loc[i,'Node']])
             attribute_csv_empty2.loc[i, 'Count'] = attribute_csv_empty2.loc[i, 'Count']+len(Edge_df[Edge_df['from'] == attribute_csv_empty2.loc[i,'Node']])
 
         min_val = min(attribute_csv_empty2['Count'])
         max_val = max(attribute_csv_empty2['Count'])
-            
+
         # Convert each number to RGB gradient
         rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,2) for num in attribute_csv_empty2['Count']]
         attribute_csv_empty2['gradient']=rgb_gradients
-        
+
         #adds the nodes from the different csv in a different colour
         nodes2 = [{
-                    "data": {"id": str(attribute_csv_empty2.loc[i, "Node"]), 
+                    "data": {"id": str(attribute_csv_empty2.loc[i, "Node"]),
                         "label": str(attribute_csv_empty2.loc[i, "Node"]),
                         'color': 'rgb'+str(attribute_csv_empty2.loc[i, "gradient"])
                         }
                     } for i in range(len(attribute_csv_empty2))]
-        nodes.extend(nodes2)   
+        nodes.extend(nodes2)
     attribute_csv_empty.set_index('Node', inplace=True)
-    
+
     #adds the edges
     edges = [
         {
@@ -90,7 +91,7 @@ def visualization(csv,attribute_csv,attribute_csv2):
             "source": str(Edge_df.loc[j, "from"]),
             "target": str(Edge_df.loc[j, "to"]),
             'label': attribute_csv_empty.loc[Edge_df.loc[j, "from"],str(attribute_csv_empty.columns[2])],
-            
+
             }
         }
         for j in range(len(Edge_df))
@@ -106,7 +107,7 @@ def visualization(csv,attribute_csv,attribute_csv2):
                 autounselectify=True,
                 elements=default_elements,
                 layout={"name": "cose-bilkent"},
-                
+
                 style={
                     "width": "100%",
                     "height": "100%",
@@ -125,7 +126,19 @@ def visualization(csv,attribute_csv,attribute_csv2):
         ]
         )
     return app.layout
-    
+
+# EXPPORT GRAPH
+
+def export_graph_to_image(graph_data, filename):
+    fig = cyto.Cytoscape(
+        id="cytoscape-export",
+        elements=graph_data['elements'],
+        layout=graph_data['layout'],
+        style=graph_data['style']
+    )
+
+    # Export the figure as an image
+    pio.write_image(fig, filename)
 
 if __name__ == '__main__':
      #load all the data that has been provided by apollo
@@ -137,9 +150,9 @@ if __name__ == '__main__':
     grant_att_table=att_table[att_table['Grant Awarded']!=0].iloc[:, 0:3]
     publ_att_table=att_table[att_table['DOI Year']!=0].iloc[:, [0,7]]
     people_att_table=att_table[att_table['Organisation']!=0].iloc[:, [0,3,4,5,6]]
-    
+
      #load the fastest visualization
     layout=visualization(grant_to_people_df,people_att_table,grant_att_table)
     #layout=visualization(knowledge_sharing,people_att_table,0)
-    
+
     app.run(debug=True, port=5001)
