@@ -127,18 +127,6 @@ def visualization(csv,attribute_csv,attribute_csv2):
         )
     return app.layout
 
-# EXPPORT GRAPH
-
-def export_graph_to_image(graph_data, filename):
-    fig = cyto.Cytoscape(
-        id="cytoscape-export",
-        elements=graph_data['elements'],
-        layout=graph_data['layout'],
-        style=graph_data['style']
-    )
-
-    # Export the figure as an image
-    pio.write_image(fig, filename)
 
 if __name__ == '__main__':
      #load all the data that has been provided by apollo
@@ -151,7 +139,7 @@ if __name__ == '__main__':
     publ_att_table=att_table[att_table['DOI Year']!=0].iloc[:, [0,7]]
     people_att_table=att_table[att_table['Organisation']!=0].iloc[:, [0,3,4,5,6]]
 
-     #load the fastest visualization
+    #load the fastest visualization
     layout=visualization(grant_to_people_df,people_att_table,grant_att_table)
     #layout=visualization(knowledge_sharing,people_att_table,0)
 
