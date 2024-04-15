@@ -1,13 +1,14 @@
 import pandas as pd
-from dash import Input, Output, callback, Dash, html, dcc
+from dash import Input, Output, callback, Dash, html, dcc, State
 import dash_cytoscape as cyto
 cyto.load_extra_layouts()
+import json
 
 # Run this app to run only the website
 app = Dash(__name__)
 
 # ################################# LOAD DATA ################################
-grant_to_people_df = pd.read_csv('dcia/static/network_visualisations/grants_to_people.csv')
+grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
 
 # ############################## PREPROCESS DATA #############################
 # Drop druplicates
@@ -72,6 +73,11 @@ default_stylesheet = [
 ]
 
 styles = {
+    "json-output": {
+        "overflow-y": "scroll",
+        "height": "calc(50% - 25px)",
+        "border": "thin lightgrey solid",
+    },
     "tab": {"height": "calc(98vh - 105px)"},
 }
 
@@ -187,7 +193,23 @@ app.layout = html.Div(
                                         ]
                                     )
                                 ]
-                            )
+                            ),
+                        dcc.Tab(
+                    label="Remove Nodes",
+                    children=[
+                        html.Button("Remove Selected Node", id="remove-button"),
+                        html.Div(
+                            style=styles["tab"],
+                            children=[
+                                html.P("Node Data JSON:"),
+                                html.Pre(
+                                    id="selected-node-data-json-output",
+                                    style=styles["json-output"],
+                                ),
+                            ]
+                        )
+                    ]
+                )
                         ]
                     )
                 ]
@@ -310,6 +332,32 @@ def update_input_color(input_value):
 @callback(Output("cytoscape", "layout"), Input("dropdown-layout", "value"))
 def update_cytoscape_layout(layout):
     return {"name": layout}
+
+@callback(
+    Output("cytoscape", "elements"),
+    Input("remove-button", "n_clicks"),
+    State("cytoscape", "elements"),
+    State("cytoscape", "selectedNodeData"),
+)
+def remove_selected_nodes(_, elements, data):
+    if elements and data:
+        ids_to_remove = {ele_data["id"] for ele_data in data}
+        print("Before:", elements)
+        new_elements = [
+            ele for ele in elements if ele["data"]["id"] not in ids_to_remove
+        ]
+        print("After:", new_elements)
+        return new_elements
+
+    return elements
+
+
+@callback(
+    Output("selected-node-data-json-output", "children"),
+    Input("cytoscape", "selectedNodeData"),
+)
+def displaySelectedNodeData(data):
+    return json.dumps(data, indent=2)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
