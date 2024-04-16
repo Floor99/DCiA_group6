@@ -32,7 +32,6 @@ def upload_files():
     return redirect(url_for('grant_applications'))
 
 
-
 @app.route("/")
 def index():
     return render_template('index.html')

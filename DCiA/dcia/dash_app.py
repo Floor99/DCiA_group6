@@ -38,8 +38,8 @@ app.layout = html.Div([
     ),
     html.Div(id='graph-output', children=initial_layout)  # Include the initial layout
 ])
-# Make sure to define last_mod_times at the top level, not inside any functions.
-last_mod_times = get_last_mod_times()
+
+last_mod_times = get_last_mod_times() # keep outside of functions!
 
 @app.callback(
     Output('graph-output', 'children'),
