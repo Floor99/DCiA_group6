@@ -12,18 +12,22 @@ def allowed_file(filename):
 
 @app.route('/upload_files', methods=['POST'])
 def upload_files():
-    files = {
-        'attributes_final.xlsx': request.files['attributes_file'],
-        'grants_to_people.csv': request.files['grants_file'],
-        'people_to_people.csv': request.files['people_file']
-    }
+    # Define the keys that match the file inputs in your HTML form
+    file_keys = ['attributes_file', 'grants_file', 'people_file']
 
-    for file_name, file in files.items():
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+    # Iterate over each expected file key
+    for file_key in file_keys:
+        # Check if the file was provided
+        if file_key in request.files and request.files[file_key].filename != '':
+            file = request.files[file_key]
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            else:
+                return f"Error with {file_key}: File not allowed or missing"
         else:
-            return f"Error with {file_name}: File not allowed or missing"
+            # If the file wasn't provided, skip it and use the existing one
+            print(f"No file provided for {file_key}, using existing file.")
 
     return redirect(url_for('grant_applications'))
 
