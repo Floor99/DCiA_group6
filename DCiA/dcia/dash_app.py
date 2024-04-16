@@ -7,8 +7,8 @@ cyto.load_extra_layouts()
 app = Dash(__name__)
 
 if __name__ == '__main__':
-    knowledge_sharing, grant_to_people_df, grant_att_table, people_att_table = load_data()
-    layout = visualization(grant_to_people_df,people_att_table,grant_att_table)
+    knowledge_sharing, ga_grants_to_people_df, ga_grants_att_table, ga_people_att_table = load_data()
+    layout = visualization(ga_grants_to_people_df,ga_people_att_table,ga_grants_att_table) # @niels is the visualisation currently without people to people? because they are not passed to the visualisation function?
 
     app.layout = layout
     app.run(debug=True, port=5001)
