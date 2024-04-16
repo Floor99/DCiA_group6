@@ -1,6 +1,33 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'dcia/static/data'
+ALLOWED_EXTENSIONS = {'csv', 'xlsx'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'xlsx', 'csv'}
+
+@app.route('/upload_files', methods=['POST'])
+def upload_files():
+    files = {
+        'attributes_final.xlsx': request.files['attributes_file'],
+        'grants_to_people.csv': request.files['grants_file'],
+        'people_to_people.csv': request.files['people_file']
+    }
+
+    for file_name, file in files.items():
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], file_name))
+        else:
+            return f"Error with {file_name}: File not allowed or missing"
+
+    return redirect(url_for('grant_applications'))
+
+
 
 @app.route("/")
 def index():
