@@ -5,26 +5,29 @@
     <h1 class="text-center my-4">Grant-applications</h1>
     <p>This network shows the articles and authors in your organization. Blue nodes represent people and grey nodes represent a paper/publication. The blue edges connect two authors if they have worked together on a publication, the grey lines connect the authors to the publications they have worked on. The thicker the line between two authors the more publications they have worked on together.</p>
     <div class="row my-4">
-        <div class="col-md-4">
-            <h3>Filters</h3>
-            <form>
-                <div class="mb-3">
-                    <label for="yearFilter" class="form-label">Year</label>
-                    <select class="form-select" id="yearFilter">
-                        <option selected>Dropdown years</option>
-                        <!-- Add year options here -->
-                    </select>
-                </div>
-                <!-- Repeat for other filters -->
-            </form>
-            <button class="btn btn-secondary">Load new data</button>
+        <div class="col-md-3">
+            <h3>Upload data</h3>
+            <form action="{{ url_for('upload_files') }}" method="post" enctype="multipart/form-data">
+              <label for="attributesFile">Upload Attributes XLSX:</label>
+              <input type="file" name="attributes_file" id="attributesFile">
+              <br>
+              <label for="grantsFile">Upload Grants to People CSV:</label>
+              <input type="file" name="grants_file" id="grantsFile">
+              <br>
+              <label for="peopleFile">Upload People to People CSV:</label>
+              <input type="file" name="people_file" id="peopleFile">
+              <br>
+              <br>
+              <input type="submit" value="Upload Files" class="btn btn-secondary">
+          </form>
+
         </div>
-        <div class="col-md-8">
-            <iframe src="http://127.0.0.1:5001" width="100%" height="600"></iframe>
-            <!-- <img src="{{ url_for('static', filename='network_example_image.png') }}" class="img-fluid" alt="Grant-applications Network"> -->
+        <div class="col-md-9">
+            <iframe src="http://127.0.0.1:5001" width="100%" height="600" style="border: 2px solid #9EA9B3; border-radius: 10px;"></iframe></iframe>
             <div class="text-end">
                 <button class="btn btn-outline-secondary mt-2">Export figure</button>
             </div>
+
         </div>
     </div>
 
@@ -32,7 +35,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Network statistics</h5>
+                    <h5 class="card-title">Network statistics (to be changed)</h5>
                     <p class="card-text">Community detection: Some information about community detection in the given network.</p>
                     <a href="#" class="btn btn-secondary">Show top 5 communities</a>
                 </div>
@@ -41,8 +44,8 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Bridge detection</h5>
-                    <p class="card-text">Some information about bridge detection in the given network.</p>
+                    <h5 class="card-title">Community detection</h5>
+                    <p class="card-text">Will produce new files with an attribute added for community that can be reuploaded above. </p>
                     <a href="#" class="btn btn-secondary">Show most important bridgers</a>
                 </div>
             </div>
