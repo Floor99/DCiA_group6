@@ -3,7 +3,6 @@ import pandas as pd
 import dash
 from dash import Input, Output, State, dcc, html, callback
 import dash_cytoscape as cyto
-from construct_graph import number_to_rgb_gradient
 from  dash_components  import NamedDropdown, DropdownOptionsList,NamedRadioItems
 
 # Load extra layouts for Cytoscape
@@ -19,7 +18,7 @@ app = dash.Dash(__name__, external_stylesheets= [
 app.css.config.serve_locally = True
 
 # ################################# LOAD DATA ################################
-grant_to_people_df = pd.read_csv('dcia/static/network_visualisations/grants_to_people.csv')
+grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
 
 
 # ############################## PREPROCESS DATA #############################
