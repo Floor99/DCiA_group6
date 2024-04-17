@@ -27,6 +27,8 @@ nodes = set()
 cyto_edges = []
 cyto_nodes = []
 
+default_elements = cyto_edges + cyto_nodes
+
 for index, edge in edges.iterrows():
     source, target = edge['from'], edge['to']
 
@@ -198,6 +200,7 @@ app.layout = html.Div(
                     label="Remove Nodes",
                     children=[
                         html.Button("Remove Selected Node", id="remove-button"),
+                        html.Button("Reset", id = "bt-reset"),
                         html.Div(
                             style=styles["tab"],
                             children=[
@@ -334,10 +337,11 @@ def update_cytoscape_layout(layout):
     return {"name": layout}
 
 @callback(
-    Output("cytoscape", "elements"),
+    Output("cytoscape", "elements", allow_duplicate=True),
     Input("remove-button", "n_clicks"),
     State("cytoscape", "elements"),
     State("cytoscape", "selectedNodeData"),
+    prevent_initial_call=True
 )
 def remove_selected_nodes(_, elements, data):
     if elements and data:
@@ -351,6 +355,15 @@ def remove_selected_nodes(_, elements, data):
 
     return elements
 
+@callback(
+    Output("cytoscape", "zoom"),
+    Output("cytoscape", "elements"),
+    Input("bt-reset", "n_clicks")
+)
+def reset_layout(n_clicks):
+    print(n_clicks, "click")
+
+    return [1, default_elements]
 
 @callback(
     Output("selected-node-data-json-output", "children"),
