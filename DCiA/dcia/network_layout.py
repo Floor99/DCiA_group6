@@ -27,6 +27,8 @@ nodes = set()
 cyto_edges = []
 cyto_nodes = []
 
+default_elements = cyto_edges + cyto_nodes
+
 for index, edge in edges.iterrows():
     source, target = edge['from'], edge['to']
 
@@ -78,7 +80,7 @@ styles = {
         "height": "calc(50% - 25px)",
         "border": "thin lightgrey solid",
     },
-    "tab": {"height": "calc(98vh - 105px)"},
+    "tab": {"height": "calc(98vh - 115px)"},
 }
 
 # ############################## APP LAYOUT #############################
@@ -149,7 +151,7 @@ app.layout = html.Div(
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of persons linked to grant:",
+                                        html.P(children = "Color of persons:", 
                                             style ={
                                                 "marginLeft": "3px"
                                                 }
@@ -167,7 +169,7 @@ app.layout = html.Div(
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of grants linked to person:",
+                                        html.P(children = "Color of grants:", 
                                             style = {
                                                 "marginLeft": "3px"
                                                 }
@@ -198,6 +200,7 @@ app.layout = html.Div(
                     label="Remove Nodes",
                     children=[
                         html.Button("Remove Selected Node", id="remove-button"),
+                        html.Button("Reset", id = "bt-reset"),
                         html.Div(
                             style=styles["tab"],
                             children=[
@@ -229,6 +232,8 @@ app.layout = html.Div(
                     layout = {
                         "name": "cose-bilkent",
                         },
+                    boxSelectionEnabled=True, 
+                    userPanningEnabled=True
                 )
             ],
         ),
@@ -334,10 +339,11 @@ def update_cytoscape_layout(layout):
     return {"name": layout}
 
 @callback(
-    Output("cytoscape", "elements"),
+    Output("cytoscape", "elements", allow_duplicate=True),
     Input("remove-button", "n_clicks"),
     State("cytoscape", "elements"),
     State("cytoscape", "selectedNodeData"),
+    prevent_initial_call=True
 )
 def remove_selected_nodes(_, elements, data):
     if elements and data:
@@ -351,6 +357,15 @@ def remove_selected_nodes(_, elements, data):
 
     return elements
 
+@callback(
+    Output("cytoscape", "zoom"),
+    Output("cytoscape", "elements"),
+    Input("bt-reset", "n_clicks")
+)
+def reset_layout(n_clicks):
+    print(n_clicks, "click")
+
+    return [1, default_elements]
 
 @callback(
     Output("selected-node-data-json-output", "children"),
