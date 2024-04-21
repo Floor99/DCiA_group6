@@ -80,7 +80,7 @@ styles = {
         "height": "calc(50% - 25px)",
         "border": "thin lightgrey solid",
     },
-    "tab": {"height": "calc(98vh - 105px)"},
+    "tab": {"height": "calc(98vh - 115px)"},
 }
 
 # ############################## APP LAYOUT #############################
@@ -151,7 +151,7 @@ app.layout = html.Div(
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of persons linked to grant:", 
+                                        html.P(children = "Color of persons:", 
                                             style ={
                                                 "marginLeft": "3px"
                                                 }
@@ -169,7 +169,7 @@ app.layout = html.Div(
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of grants linked to person:", 
+                                        html.P(children = "Color of grants:", 
                                             style = {
                                                 "marginLeft": "3px"
                                                 }
@@ -232,6 +232,8 @@ app.layout = html.Div(
                     layout = {
                         "name": "cose-bilkent",
                         },
+                    boxSelectionEnabled=True, 
+                    userPanningEnabled=True
                 )
             ],
         ),
