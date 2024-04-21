@@ -20,7 +20,7 @@ edges = edge_data.copy()
 nodes = set()
 
 # Data looks like this
-# From          To 
+# From          To
 # People        Grant
 # Source        Target
 
@@ -36,7 +36,7 @@ for index, edge in edges.iterrows():
         nodes.add(source)
         cyto_nodes.append({
             "data": {
-                "id": str(source), 
+                "id": str(source),
                 "label": str(source)
             }
         })
@@ -44,20 +44,20 @@ for index, edge in edges.iterrows():
         nodes.add(target)
         cyto_nodes.append({
             "data": {
-                "id": str(target), 
+                "id": str(target),
                 "label": str(target)
             }
         })
-        
+
     cyto_edges.append({
         "data": {
-            "source": str(source), 
+            "source": str(source),
             "target": str(target)
             }
         })
-  
+
 # ############################## MAKE DEFAULT STYLESHEET #############################
-    
+
 default_stylesheet = [
     {
         "selector": "node",
@@ -66,9 +66,9 @@ default_stylesheet = [
         },
     },
     {
-        "selector": "edge", 
+        "selector": "edge",
         "style": {
-            "curve-style": "bezier", 
+            "curve-style": "bezier",
             "opacity": 0.65
         }
     }
@@ -99,9 +99,9 @@ app.layout = html.Div(
                         dcc.Tab(
                             label="Layout",
                             children=[
-                                html.Div( 
+                                html.Div(
                                     children = [
-                                        html.P(children = "Graph layout:", 
+                                        html.P(children = "Graph layout:",
                                                 style={
                                                     "marginLeft": "3px"
                                                     }
@@ -122,9 +122,9 @@ app.layout = html.Div(
                                         ),
                                     ],
                                 ),
-                                html.Div( 
+                                html.Div(
                                     children = [
-                                        html.P(children = "Node shape:", 
+                                        html.P(children = "Node shape:",
                                                 style={
                                                     "marginLeft": "3px"
                                                     }
@@ -183,7 +183,7 @@ app.layout = html.Div(
                                                 }
                                         ),
                                     ],
-                                    ),       
+                                    ),
                                 ],
                             ),
                         dcc.Tab(
@@ -238,7 +238,7 @@ app.layout = html.Div(
             ],
         ),
     ]
-)                        
+)
 
 
 @callback(
@@ -253,7 +253,7 @@ app.layout = html.Div(
 def generate_stylesheet(node, source_color, target_color, node_shape):
     if not node:
         return default_stylesheet
-    
+
     stylesheet = [
         {"selector": "node", "style": {"opacity": 0.3, "shape": node_shape}},
         {
@@ -375,4 +375,4 @@ def displaySelectedNodeData(data):
     return json.dumps(data, indent=2)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=False, port=5003)
