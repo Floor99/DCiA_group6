@@ -1,15 +1,17 @@
 import pandas as pd
-from dash import Input, Output, callback, Dash, html, dcc, State
+from dash import Input, Output, callback, Dash, html, dcc, State,callback_context
 import dash_cytoscape as cyto
 cyto.load_extra_layouts()
 import json
+from feature_table import feature_table
+from dash.exceptions import PreventUpdate
+from f_load_data import load_data
 
 # Run this app to run only the website
 app = Dash(__name__)
 
 # ################################# LOAD DATA ################################
-grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
-
+knowledge_sharing, grant_to_people_df,from_att_df,to_att_df=load_data()
 # ############################## PREPROCESS DATA #############################
 # Drop druplicates
 edge_data = grant_to_people_df.drop_duplicates(keep="first").reset_index(drop=True)
@@ -29,21 +31,29 @@ cyto_nodes = []
 
 for index, edge in edges.iterrows():
     source, target = edge['from'], edge['to']
-
     if source not in nodes:
+        size_node=from_att_df[from_att_df['Node']==source].reset_index(drop=True).loc[0,'Node_Size']
+        size_node=str(15+25*size_node) +'px'
+        
         nodes.add(source)
         cyto_nodes.append({
             "data": {
                 "id": str(source), 
-                "label": str(source)
+                "label": str(source),
+                "size": size_node,
+                "color": 'red'
             }
         })
     if target not in nodes:
+        size_node=to_att_df[to_att_df['Node']==target].reset_index(drop=True).loc[0,'Node_Size']
+        size_node=str(15+25*size_node) +'px'
         nodes.add(target)
         cyto_nodes.append({
             "data": {
                 "id": str(target), 
-                "label": str(target)
+                "label": str(target),
+                "size": size_node,
+                'color': 'blue'
             }
         })
         
@@ -60,14 +70,16 @@ default_stylesheet = [
     {
         "selector": "node",
         "style": {
-            "opacity": 0.65
+            "opacity": 0.55,'width': 'data(size)',
+                    'height': 'data(size)',
+                    'background-color':'data(color)',
         },
     },
     {
         "selector": "edge", 
         "style": {
             "curve-style": "bezier", 
-            "opacity": 0.65
+            'opacity':0.2,'width': "2",
         }
     }
 ]
@@ -75,7 +87,9 @@ default_stylesheet = [
 styles = {
     "json-output": {
         "overflow-y": "scroll",
-        "height": "calc(50% - 25px)",
+        "overflow-x": "scroll",
+        "height": "calc(90% - 25px)",
+        "width": "350px",
         "border": "thin lightgrey solid",
     },
     "tab": {"height": "calc(98vh - 105px)"},
@@ -104,6 +118,18 @@ app.layout = html.Div(
                                                     "marginLeft": "3px"
                                                     }
                                                 ),
+                                        dcc.Dropdown(
+                                        id='color-dropdown',
+                                        options=[
+                                                {'label': 'Red', 'value': 'red'},
+                                                {'label': 'Green', 'value': 'green'},
+                                                {'label': 'Blue', 'value': 'blue'},
+                                                {'label': 'Orange', 'value': 'orange'}
+                                            ]
+,
+                                        value='red'  # Default color selection
+                                        ),
+                                        
                                         dcc.Dropdown(
                                             id = "dropdown-layout",
                                             options = [
@@ -198,6 +224,7 @@ app.layout = html.Div(
                     label="Remove Nodes",
                     children=[
                         html.Button("Remove Selected Node", id="remove-button"),
+                        
                         html.Div(
                             style=styles["tab"],
                             children=[
@@ -206,6 +233,9 @@ app.layout = html.Div(
                                     id="selected-node-data-json-output",
                                     style=styles["json-output"],
                                 ),
+                            
+                                
+                                
                             ]
                         )
                     ]
@@ -243,18 +273,38 @@ app.layout = html.Div(
         Input("input-source-color", "value"),
         Input("input-target-color", "value"),
         Input("dropdown-node-shape", "value"),
+        Input('color-dropdown', 'value')
     ],
 )
-def generate_stylesheet(node, source_color, target_color, node_shape):
+def generate_stylesheet(node, source_color, target_color, node_shape,node_color):
+    
+    
     if not node:
-        return default_stylesheet
+        return [
+    {
+        "selector": "node",
+        "style": {
+            "opacity": 0.55,'width': 'data(size)',
+                    'height': 'data(size)',
+                    'background-color':node_color,
+        },
+    },
+    {
+        "selector": "edge", 
+        "style": {
+            "curve-style": "bezier", 
+            'opacity':0.2,'width': "2",
+        }
+    }
+]
     
     stylesheet = [
-        {"selector": "node", "style": {"opacity": 0.3, "shape": node_shape}},
+        {"selector": "node", "style": {"opacity": 0.3, "shape": node_shape,'width': 'data(size)',
+                    'height': 'data(size)','background-color':node_color}},
         {
             "selector": "edge",
             "style": {
-                "opacity": 0.2,
+                'opacity':0.2,'width': "2",
                 "curve-style": "bezier",
             },
         },
@@ -280,7 +330,9 @@ def generate_stylesheet(node, source_color, target_color, node_shape):
             stylesheet.append(
                 {
                     "selector": f'node[id = "{edge["target"]}"]',
-                    "style": {"background-color": target_color, "opacity": 0.9},
+                    "style": {"background-color": target_color, "opacity": 0.9,"label": "data(label)","text-opacity": 0.8,
+                    "font-size": 12,},
+                    
                 }
             )
             stylesheet.append(
@@ -290,6 +342,7 @@ def generate_stylesheet(node, source_color, target_color, node_shape):
                         "mid-target-arrow-color": target_color,
                         "mid-target-arrow-shape": "vee",
                         "line-color": target_color,
+                        
                         "opacity": 0.9,
                         "z-index": 5000,
                     },
@@ -304,6 +357,9 @@ def generate_stylesheet(node, source_color, target_color, node_shape):
                         "background-color": source_color,
                         "opacity": 0.9,
                         "z-index": 9999,
+                        "label": "data(label)",
+                        "text-opacity": 0.8,
+                    "font-size": 12,
                     },
                 }
             )
@@ -329,27 +385,29 @@ def generate_stylesheet(node, source_color, target_color, node_shape):
 def update_input_color(input_value):
     return {"color": input_value}
 
+
 @callback(Output("cytoscape", "layout"), Input("dropdown-layout", "value"))
 def update_cytoscape_layout(layout):
     return {"name": layout}
+    
 
-@callback(
-    Output("cytoscape", "elements"),
+@app.callback(
+    Output("cytoscape", "elements"),[
     Input("remove-button", "n_clicks"),
     State("cytoscape", "elements"),
-    State("cytoscape", "selectedNodeData"),
+    State("cytoscape", "selectedNodeData"),]
 )
 def remove_selected_nodes(_, elements, data):
-    if elements and data:
-        ids_to_remove = {ele_data["id"] for ele_data in data}
-        print("Before:", elements)
-        new_elements = [
-            ele for ele in elements if ele["data"]["id"] not in ids_to_remove
-        ]
-        print("After:", new_elements)
-        return new_elements
+        if elements and data:
+            ids_to_remove = {ele_data["id"] for ele_data in data}
+            print("Before:", elements)
+            new_elements = [
+                ele for ele in elements if ele["data"]["id"] not in ids_to_remove
+            ]
+            print("After:", new_elements)
+            return new_elements
 
-    return elements
+        return elements
 
 
 @callback(
@@ -357,7 +415,17 @@ def remove_selected_nodes(_, elements, data):
     Input("cytoscape", "selectedNodeData"),
 )
 def displaySelectedNodeData(data):
-    return json.dumps(data, indent=2)
+    if data and data!=None:
+        for i in range(len(data)):
+            
+            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+            if i==0:
+                tables=[table1,]                                                                
+            else:
+                tables.extend([table1,])
+        return tables
+    raise PreventUpdate                                                                                                 
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
