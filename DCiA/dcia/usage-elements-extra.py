@@ -30,42 +30,97 @@ edge_data = edge_data[edge_data['from'] != edge_data['to']].reset_index(drop=Tru
 edges = edge_data.copy()
 nodes = set()
 
-# Data looks like this
-# From          To 
-# People        Grant
-# Source        Target
+########################### Deze Code is voor nu niet nodig #######################################
+# # Data looks like this
+# # From          To 
+# # People        Grant
+# # Source        Target
 
-cyto_edges = []
-cyto_nodes = []
+# cyto_edges = []
+# cyto_nodes = []
 
-for index, edge in edges.iterrows():
-    source, target = edge['from'], edge['to']
+# for index, edge in edges.iterrows():
+#     source, target = edge['from'], edge['to']
 
-    if source not in nodes:
-        nodes.add(source)
-        cyto_nodes.append({
-            "data": {
-                "id": str(source), 
-                "label": str(source)
-            }
-        })
-    if target not in nodes:
-        nodes.add(target)
-        cyto_nodes.append({
-            "data": {
-                "id": str(target), 
-                "label": str(target)
-            }
-        })
+#     if source not in nodes:
+#         nodes.add(source)
+#         cyto_nodes.append({
+#             "data": {
+#                 "id": str(source), 
+#                 "label": str(source)
+#             }
+#         })
+#     if target not in nodes:
+#         nodes.add(target)
+#         cyto_nodes.append({
+#             "data": {
+#                 "id": str(target), 
+#                 "label": str(target)
+#             }
+#         })
         
-    cyto_edges.append({
-        "data": {
-            "source": str(source), 
-            "target": str(target)
-            }
-        })
+#     cyto_edges.append({
+#         "data": {
+#             "source": str(source), 
+#             "target": str(target)
+#             }
+#         })
     
+########################### Stylesheet ##########################################################
 
+# Define the cytoscape stylesheet
+styles = {
+    "json-output": {
+        "overflow-y": "scroll",
+        "height": "calc(50% - 25px)",
+        "border": "thin lightgrey solid",
+    },
+    "tab": {"height": "calc(98vh - 80px)"},
+}
+
+# Define the styles of the CSS components
+styles = {
+    "json-output": {
+        "overflow-y": "scroll",
+        "height": "calc(50% - 25px)",
+        "border": "thin lightgrey solid",
+    },
+    "tab": {"height": "calc(98vh - 115px)"},
+    "button":{"alignItems": "center",
+            "appearance": "none",
+            "backgroundColor": "#fff",
+            "borderRadius": "24px",
+            "borderStyle": "none",
+            "boxShadow": "rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 15px 0",
+            "boxSizing": "border-box",
+            "color": "#3c4043",
+            "cursor": "pointer",
+            "display": "inline-flex",
+            "fill": "currentcolor",
+            "fontFamily": '"Google Sans",Roboto,Arial,sans-serif',
+            "fontSize": "13px",
+            "fontWeight": "500",
+            "height": "30px",
+            "justifyContent": "center",
+            "letterSpacing": ".25px",
+            "lineHeight": "normal",
+            "maxWidth": "100%",
+            "overflow": "visible",
+            "padding": "2px 24px",
+            "position": "relative",
+            "textAlign": "center",
+            "textTransform": "none",
+            "transition": "box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms",
+            "userSelect": "none",
+            "-webkitUserSelect": "none",
+            "touchAction": "manipulation",
+            "width": "auto",
+            "willChange": "transform,opacity",
+            "zIndex": "0"
+        }
+}
+
+########################### Functions ###################################################################
 # Initialize global data structures for node expansion (followers and following)
 def populate_relationships(edges):
     """This function creates and populates dictionaries representing nodes and edges in the graph."""
@@ -114,6 +169,7 @@ def populate_relationships(edges):
 
     return following_node_di, following_edges_di, followers_node_di, followers_edges_di
 
+############################### This function is a replacement for the search bar ###################################
 def get_node_with_highest_degree(edges_dict):
     """This function calculates the degree of each node and returns the node with the highest degree."""
     degrees = {}
@@ -137,23 +193,20 @@ def get_node_with_highest_degree(edges_dict):
     
     return node_with_highest_degree
 
+######################################## Initiate functions ####################################################
 following_node_di, following_edges_di, followers_node_di, followers_edges_di = populate_relationships(edges)
 
 
 genesis_node = get_node_with_highest_degree(following_edges_di)
 default_elements = [genesis_node]
-# The app layout style
-styles = {
-    "json-output": {
-        "overflow-y": "scroll",
-        "height": "calc(50% - 25px)",
-        "border": "thin lightgrey solid",
-    },
-    "tab": {"height": "calc(98vh - 80px)"},
-}
+
+################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
 app.layout = html.Div(
-    [
+    [ html.Link(
+        rel='stylesheet',
+        href='https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cosmo/bootstrap.min.css'
+    ),
         # Control panel and JSON output components
         html.Div(
             children=[
@@ -180,7 +233,7 @@ app.layout = html.Div(
                                         "spread",
                                         "euler",
                                     ),
-                                    value="grid",
+                                    value="cose-bilkent",
                                     clearable=False,
                                 ),
                                 NamedRadioItems(
@@ -197,17 +250,17 @@ app.layout = html.Div(
                             label="JSON",
                             children=[
                                 html.Div(
-                                    style=styles["tab"],
+                                    #style=styles["tab"],
                                     children=[
                                         html.P("Node Object JSON:"),
                                         html.Pre(
                                             id="tap-node-json-output",
-                                            style=styles["json-output"],
+                                            #style=styles["json-output"],
                                         ),
                                         html.P("Edge Object JSON:"),
                                         html.Pre(
                                             id="tap-edge-json-output",
-                                            style=styles["json-output"],
+                                            #style=styles["json-output"],
                                         ),
                                     ],
                                 ),
@@ -224,15 +277,16 @@ app.layout = html.Div(
         # Cytoscape network visualization component
         html.Div(style= {
                     "minWidth" : "75%"
+                    
                 }, children=[
             cyto.Cytoscape(
                 style= {
                     "minWidth": "100%",
-                    "minHeight" : "100%"
+                    "height": "95vh"
                 },
                 id="cytoscape",
-                elements=default_elements,  # This will be populated dynamically
-                stylesheet=[
+                elements=default_elements,  
+                stylesheet=[ # Default stylesheet
                         {
                             "selector": "node",
                             "style": {
@@ -246,7 +300,7 @@ app.layout = html.Div(
                                 "opacity": 0.65
                             }
                             },
-                ],  # Define or dynamically generate stylesheets
+                ], 
             )
         ]),
     ],
@@ -261,7 +315,7 @@ app.layout = html.Div(
 
 # Define callbacks for interactive features (node/edge taps, layout changes, etc.)
 # Include callbacks for updating the layout, displaying JSON data, and expanding nodes
-
+############################### Callbacks ################################################################
 @app.callback(
     Output("cytoscape", "elements"),
     Input("cytoscape", "tapNode"),
