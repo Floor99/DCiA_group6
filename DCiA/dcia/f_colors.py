@@ -54,7 +54,7 @@ def get_colors(df,column,datatype):
     if datatype=='Binary':
         df.loc[df[column].isin([0, 2]) , 'color'] = 'yellow'
         df.loc[df[column]==1 , 'color'] = 'red'
-    elif datatype=='Other' or datatype=='Categorical':
+    elif datatype=='Other'or datatype=='Low_Integer' or datatype=='Categorical':
         color_mapping = {}
         unique_values = df[column].unique()
         for i, value in enumerate(unique_values):
@@ -62,7 +62,7 @@ def get_colors(df,column,datatype):
         # Map colors to each row based on the 'Type' column
         df['color'] = df[column].map(color_mapping)
     
-    elif datatype=='High_Integer'or datatype=='Low_Integer' or datatype=='Real':
+    elif datatype=='High_Integer' or datatype=='Real':
         min_val = min(df[column])
         max_val = max(df[column])
         rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,1) for num in df[column]]
@@ -74,7 +74,7 @@ def get_colors2(df,column,datatype):
     if datatype=='Binary':
         df.loc[df[column].isin([0, 2]) , 'color'] = 'green'
         df.loc[df[column]==1 , 'color'] = 'cyan'
-    elif datatype=='Other'  or datatype=='Categorical':
+    elif datatype=='Other' or datatype=='Low_Integer' or datatype=='Categorical':
         color_mapping = {}
         unique_values = df[column].unique()
         for i, value in enumerate(unique_values):
@@ -82,7 +82,7 @@ def get_colors2(df,column,datatype):
         # Map colors to each row based on the 'Type' column
         df['color'] = df[column].map(color_mapping)
     
-    elif datatype=='High_Integer'or datatype=='Low_Integer' or datatype=='Real':
+    elif datatype=='High_Integer' or datatype=='Real':
         min_val = min(df[column])
         max_val = max(df[column])
         rgb_gradients = [number_to_rgb_gradient(num, min_val, max_val,2) for num in df[column]]
