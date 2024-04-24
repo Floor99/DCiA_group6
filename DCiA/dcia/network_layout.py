@@ -158,11 +158,12 @@ app.layout = html.Div(
                             children=[
                                 html.Div(
                                     children = [
-                                        html.P(children = "Graph layout:",
+                                        html.P(children = "Graph filters:",
                                                 style={
                                                     "marginLeft": "3px"
                                                     }
                                                 ),
+                                        html.P("Node filter for persons:"),
                                         dcc.Dropdown(
                                         id='color-dropdown',
                                         options=[
@@ -171,6 +172,7 @@ app.layout = html.Div(
                                                                     'value': key} for key,value in data_types.items()],
                                         value=None  # Default color selection
                                         ),
+                                        html.P("Node filter for grants:"),
                                         dcc.Dropdown(
                                         id='color-dropdown2',
                                         options=[
@@ -179,7 +181,7 @@ app.layout = html.Div(
                                                                     'value': key} for key,value in data_types2.items()],
                                         value=None  # Default color selection
                                         ),
-                                        
+                                        html.P("graph layout:"),
                                         dcc.Dropdown(
                                             id = "dropdown-layout",
                                             options = [
@@ -387,8 +389,6 @@ def get_triggered_id():
 )
 def generate_stylesheet(person_shape, grant_shape, source_color, target_color, search_value, node,color_dropdown,color_dropdown2):
     triggered_id = get_triggered_id()
-    print(color_dropdown)
-    print(color_dropdown2)
     if triggered_id == "color-dropdown" or triggered_id == "color-dropdown2":
         drop_down_type = data_types.get(color_dropdown)
         first_df=get_colors(from_df,color_dropdown,drop_down_type)
