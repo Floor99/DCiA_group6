@@ -10,6 +10,7 @@ def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
             df = pd.DataFrame(columns=['Selected Node', str(ID)])
             for column_name, value in list(row_value.items())[2:]:
                 if column_name !='Node_Size':
+                    column_name = truncate_with_dots(column_name)
                     df.loc[len(df)] = [column_name, value]
             filtered_df = grant_to_people_df[grant_to_people_df.eq(ID).any(axis=1)].iloc[:, 1]
             if len(filtered_df) % 2 != 0:
@@ -22,6 +23,7 @@ def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
             df = pd.DataFrame(columns=['Selected Node', str(ID)])
             for column_name, value in list(row_value.items())[2:]:
                 if column_name !='Node_Size':
+                    column_name = truncate_with_dots(column_name)
                     df.loc[len(df)] = [column_name, value]
             filtered_df = grant_to_people_df[grant_to_people_df.eq(ID).any(axis=1)].iloc[:, 0]
             if len(filtered_df) % 2 != 0:
@@ -62,3 +64,9 @@ def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
             'table-layout': 'fixed',
             'justify-content': 'space-between'}
         )])
+        
+def truncate_with_dots(string):
+    if len(str(string)) > 20:
+        return string[:18] + ".."
+    else:
+        return string
