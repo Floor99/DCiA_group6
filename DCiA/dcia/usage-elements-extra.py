@@ -324,6 +324,8 @@ def generate_elements(nodeData, elements, expansion_mode):
 
     return elements
 
+
+
 @app.callback(
     Output("cytoscape", "layout"),
     [Input("dropdown-layout", "value")])
