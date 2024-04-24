@@ -1,0 +1,12 @@
+body {
+    font-family: 'Alegreya Sans', sans-serif;
+    min-height: 100%; /* Minimum height is full viewport */
+    margin: 0px;
+    padding: 0px;
+}
+html {
+    min-height: 100%;
+}
+#react-entry-point {
+    min-height: 100%;
+}

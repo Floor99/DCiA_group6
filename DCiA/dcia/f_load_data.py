@@ -2,14 +2,12 @@ import pandas as pd
 
 def load_data():
     # Load people_to_people.csv, grants_to_people.csv and attribute_tabel_final.xlsx
-    knowledge_sharing = pd.read_csv('dcia/static/data/people_to_people.csv')
-    grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
     att_table = pd.read_excel('dcia/static/data/attributes_final.xlsx')
-   
+    grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
+    people_to_people_df = pd.read_csv('dcia/static/data/people_to_people.csv')
         
     # Extract the three attributes: grant awarded, doi year, and organisation
     grant_att_table = att_table[att_table['Grant Awarded'] != 0].iloc[:, 0:3]
-    publ_att_table = att_table[att_table['DOI Year'] != 0].iloc[:, [0, 7]]
     people_att_table = att_table[att_table['Organisation'] != 0].iloc[:, [0, 3, 4, 5, 6]]
 
     edge_df=grant_to_people_df.drop_duplicates(keep="first").reset_index(drop=True)
@@ -30,4 +28,6 @@ def load_data():
         attribute_csv_empty.loc[i, 'Connected nodes'] = attribute_csv_empty.loc[i, 'Connected nodes']+len(edge_df[edge_df['from'] == attribute_csv_empty.loc[i,'Node']])  
     max_val = max(attribute_csv_empty['Connected nodes'])
     attribute_csv_empty['Node_Size']=attribute_csv_empty['Connected nodes']/max_val 
-    return knowledge_sharing, grant_to_people_df,  attribute_csv_empty, attribute_csv1
+    attribute_csv1.set_index('Node', inplace = True, drop=False)
+    attribute_csv_empty.set_index('Node', inplace = True, drop=False)
+    return people_to_people_df, grant_to_people_df,  attribute_csv_empty, attribute_csv1
