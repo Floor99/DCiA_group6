@@ -1,14 +1,12 @@
 import json
 import pandas as pd
 import dash
-from dash import Input, Output, State, dcc, html, callback
+from dash import Input, Output, State, dcc, html
 import dash_cytoscape as cyto
 from  dash_components  import NamedDropdown, DropdownOptionsList,NamedRadioItems
 
 # Load extra layouts for Cytoscape
 cyto.load_extra_layouts()
-
-
 
 # Initialize the Dash app (assuming asset_path is defined or not needed)
 app = dash.Dash(__name__, external_stylesheets= [
@@ -30,10 +28,11 @@ edge_data = edge_data[edge_data['from'] != edge_data['to']].reset_index(drop=Tru
 edges = edge_data.copy()
 nodes = set()
 
-# Data looks like this
-# From          To 
-# People        Grant
-# Source        Target
+########################### Deze Code is voor nu niet nodig #######################################
+# # Data looks like this
+# # From          To 
+# # People        Grant
+# # Source        Target
 
 cyto_edges = []
 cyto_nodes = []
@@ -65,9 +64,31 @@ for index, edge in edges.iterrows():
             }
         })
     
+########################### Stylesheet ##########################################################
 
+# Define the cytoscape stylesheet
+styles = {
+    "json-output": {
+        "overflow-y": "scroll",
+        "height": "calc(50% - 25px)",
+        "border": "thin lightgrey solid",
+    },
+    "tab": {"height": "calc(98vh - 80px)"},
+}
+
+# Define the styles of the CSS components
+styles = {
+    "json-output": {
+        "overflow-y": "scroll",
+        "height": "calc(50% - 25px)",
+        "border": "thin lightgrey solid",
+    },
+    "tab": {"height": "calc(98vh - 115px)"},
+}
+
+########################### Functions ###################################################################
 # Initialize global data structures for node expansion (followers and following)
-def populate_relationships(edges):
+def populate_relationships(edges: list):
     """This function creates and populates dictionaries representing nodes and edges in the graph."""
     following_node_di = {}
     following_edges_di = {}
@@ -114,7 +135,8 @@ def populate_relationships(edges):
 
     return following_node_di, following_edges_di, followers_node_di, followers_edges_di
 
-def get_node_with_highest_degree(edges_dict):
+############################### This function is a replacement for the search bar ###################################
+def get_node_with_highest_degree(edges_dict: dict):
     """This function calculates the degree of each node and returns the node with the highest degree."""
     degrees = {}
     for source, edges in edges_dict.items():
@@ -137,82 +159,124 @@ def get_node_with_highest_degree(edges_dict):
     
     return node_with_highest_degree
 
+######################################## Initiate functions ####################################################
 following_node_di, following_edges_di, followers_node_di, followers_edges_di = populate_relationships(edges)
-
 
 genesis_node = get_node_with_highest_degree(following_edges_di)
 default_elements = [genesis_node]
-# The app layout style
-styles = {
-    "json-output": {
-        "overflow-y": "scroll",
-        "height": "calc(50% - 25px)",
-        "border": "thin lightgrey solid",
-    },
-    "tab": {"height": "calc(98vh - 80px)"},
-}
+
+################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
-app.layout = html.Div(
+control_panel = dcc.Tab(
+    label="Control Panel",
+    children=[
+        NamedDropdown(
+            name="Layout",
+            id="dropdown-layout",
+            options=DropdownOptionsList(
+                "random",
+                "grid",
+                "circle",
+                "concentric",
+                "breadthfirst",
+                "cose",
+                "cose-bilkent",
+                "dagre",
+                "cola",
+                "klay",
+                "spread",
+                "euler",
+            ),
+            value="cose-bilkent",
+            clearable=False,
+        ),
+        NamedRadioItems(
+            name="Expand",
+            id="radio-expand",
+            options=DropdownOptionsList(
+                "People", "Grant"
+            ),
+            value="People",
+        ),
+        html.P(
+            children = "Search for person or grant:", 
+            style = {
+                "marginLeft": "3px"
+                }
+            ),
+            dcc.Input(
+                id="search-input",
+                type="text",
+                placeholder = "Type to search..."
+            )
+    ],
+)
+json_panel = dcc.Tab(
+    label="JSON",
+    children=[
+        html.Div(
+            #style=styles["tab"],
+            children=[
+                html.P("Node Object JSON:"),
+                html.Pre(
+                    id="tap-node-json-output",
+                    #style=styles["json-output"],
+                ),
+                html.P("Edge Object JSON:"),
+                html.Pre(
+                    id="tap-edge-json-output",
+                    #style=styles["json-output"],
+                )
+            ]
+        )
+    ]
+)
+# Cytoscape network visualization component
+cytoscape_panel = html.Div(
+    style= {
+        "minWidth" : "75%"
+    },
+    children=
     [
+        cyto.Cytoscape(
+            style= {
+                "minWidth": "100%",
+                "height": "95vh"
+            },
+            id="cytoscape",
+            elements=default_elements,  
+            stylesheet=[
+                # Default stylesheet
+                {
+                    "selector": "node",
+                    "style": {
+                        "opacity": 0.65
+                    }
+                },
+                {
+                    "selector": "edge", 
+                    "style": {
+                        "curve-style": "bezier", 
+                        "opacity": 0.65
+                    }
+                },
+            ]
+        )
+    ])
+
+app.layout = html.Div(
+    [ html.Link(
+        rel='stylesheet',
+        href='https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cosmo/bootstrap.min.css'
+    ),
         # Control panel and JSON output components
         html.Div(
             children=[
                 dcc.Tabs(
                     id="tabs",
                     children=[
-                        dcc.Tab(
-                            label="Control Panel",
-                            children=[
-                                NamedDropdown(
-                                    name="Layout",
-                                    id="dropdown-layout",
-                                    options=DropdownOptionsList(
-                                        "random",
-                                        "grid",
-                                        "circle",
-                                        "concentric",
-                                        "breadthfirst",
-                                        "cose",
-                                        "cose-bilkent",
-                                        "dagre",
-                                        "cola",
-                                        "klay",
-                                        "spread",
-                                        "euler",
-                                    ),
-                                    value="grid",
-                                    clearable=False,
-                                ),
-                                NamedRadioItems(
-                                    name="Expand",
-                                    id="radio-expand",
-                                    options=DropdownOptionsList(
-                                        "People", "Grant"
-                                    ),
-                                    value="People",
-                                ),
-                            ],
-                        ),
-                        dcc.Tab(
-                            label="JSON",
-                            children=[
-                                html.Div(
-                                    style=styles["tab"],
-                                    children=[
-                                        html.P("Node Object JSON:"),
-                                        html.Pre(
-                                            id="tap-node-json-output",
-                                            style=styles["json-output"],
-                                        ),
-                                        html.P("Edge Object JSON:"),
-                                        html.Pre(
-                                            id="tap-edge-json-output",
-                                            style=styles["json-output"],
-                                        ),
-                                    ],
-                                ),
-                            ],
-                        ),
+                        control_panel,
+                        json_panel
                     ],
                 ),
             ],
@@ -220,37 +284,10 @@ app.layout = html.Div(
                 "minWidth" : "25%"
             }
         ),
-
-        # Cytoscape network visualization component
-        html.Div(style= {
-                    "minWidth" : "75%"
-                }, children=[
-            cyto.Cytoscape(
-                style= {
-                    "minWidth": "100%",
-                    "minHeight" : "100%"
-                },
-                id="cytoscape",
-                elements=default_elements,  # This will be populated dynamically
-                stylesheet=[
-                        {
-                            "selector": "node",
-                            "style": {
-                                "opacity": 0.65
-                            },
-                            },
-                            {
-                            "selector": "edge", 
-                            "style": {
-                                "curve-style": "bezier", 
-                                "opacity": 0.65
-                            }
-                            },
-                ],  # Define or dynamically generate stylesheets
-            )
-        ]),
+        cytoscape_panel
     ],
-    style={
+    style=
+    {
         "display": "flex",
         "flexDirection": "row",
         "width": "100%"
@@ -261,20 +298,25 @@ app.layout = html.Div(
 
 # Define callbacks for interactive features (node/edge taps, layout changes, etc.)
 # Include callbacks for updating the layout, displaying JSON data, and expanding nodes
-
+############################### Callbacks ################################################################
 @app.callback(
-    Output("cytoscape", "elements"),
+    Output("cytoscape", "elements",allow_duplicate=True),
     Input("cytoscape", "tapNode"),
     State("cytoscape", "elements"),
-    State("radio-expand", "value")
+    State("radio-expand", "value"),
+    prevent_initial_call=True
 )
-def generate_elements(nodeData, elements, expansion_mode):
-    #print(elements)
+def generate_elements(nodeData: dict, elements: dict, expansion_mode):
+    """
+    No Node has no data, return the elements unchanged. 
+    :param dict nodeData: nodedata contains: (expanded: bool), (class: string) and (data: dict) with (id: string), (label: string)
+    :param dict elements: all elements returned from cytoscape.
+    """
     if not nodeData:
-        return elements  # No Node has no data, return the elements unchanged. 
+        return elements
     
+    # Node has already been expanded; no further action is necessary.
     if nodeData.get("expanded"):
-        # Node has already been expanded; no further action is necessary.
         return elements 
 
     # Mark the node as expanded to prevent re-expansion.
@@ -285,16 +327,9 @@ def generate_elements(nodeData, elements, expansion_mode):
 
     # Expand nodes based on the expansion mode (followers or following).
     if expansion_mode == "People":
-        # Add follower nodes and edges.
-        
-        print(nodeData["data"]["id"])
-        
+        # Add follower nodes and edges. 
         followers_nodes = followers_node_di.get(int(nodeData["data"]["id"]))
-        #followers_nodes = [item['data']['id'] for item in followers_node_di[int(nodeData["data"]["id"])]]
-        #followers_edges = [item['data']['source'] + item['data']['target'] for item in followers_edges_di[int(nodeData["data"]["id"])]]
         followers_edges = followers_edges_di.get(int(nodeData["data"]["id"]))
-        print(followers_nodes)
-        print(followers_edges)
         if followers_nodes:
             for node in followers_nodes:
                 node["classes"] = "followerNode"
@@ -308,8 +343,6 @@ def generate_elements(nodeData, elements, expansion_mode):
         # Add following nodes and edges.
         following_nodes = following_node_di.get(int(nodeData["data"]["id"]))
         following_edges = following_edges_di.get(int(nodeData["data"]["id"]))
-        #following_nodes = [{int(item['data']['id']) for item in following_node_di[int(nodeData["data"]["id"])]}]
-        #ollowing_edges = [{int((item['data']['source'] + item['data']['target'])) for item in following_edges_di[int(nodeData["data"]["id"])]}]
 
         if following_nodes:
             for node in following_nodes:
@@ -324,7 +357,24 @@ def generate_elements(nodeData, elements, expansion_mode):
 
     return elements
 
+@app.callback(
+    Output("cytoscape", "elements",allow_duplicate=True), 
+    Input("search-input", "value"),
+    prevent_initial_call=True
+)
+def update_graph(search_value):
+    if not search_value:
+        return cyto_edges + cyto_nodes
+    filtered_data_edges = []
+    filtered_data_nodes = set()
 
+    for edge in cyto_edges:
+        if edge['data']['source'] == search_value or edge['data']['target'] == search_value:
+            filtered_data_edges.append(edge)
+            filtered_data_nodes.update([edge['data']['source'], edge['data']['target']])
+    new_cyto_nodes = [node for node in cyto_nodes if node['data']['id'] in filtered_data_nodes]
+  
+    return filtered_data_edges + new_cyto_nodes
 
 @app.callback(
     Output("cytoscape", "layout"),
@@ -343,7 +393,6 @@ def display_tap_node(data):
     [Input("cytoscape", "tapEdge")])
 def display_tap_edge(data):
     return json.dumps(data, indent=2) if data else ""
-# Additional callbacks for layout update and JSON display
 
 if __name__ == "__main__":
     app.run_server(debug=True,port = 5002)
