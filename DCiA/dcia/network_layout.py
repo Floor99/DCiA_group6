@@ -1,21 +1,24 @@
 import pandas as pd
-from dash import Input, Output, callback, Dash, html, dcc, State, no_update
+from dash import Input, Output, callback, Dash, html, dcc, State,callback_context, no_update
 import dash_cytoscape as cyto
 from dash import callback_context
 cyto.load_extra_layouts()
 import json
-
+from feature_table import feature_table
+from dash.exceptions import PreventUpdate
+from f_load_data import load_data
+from f_colors import check_data_types,get_colors,get_colors2
+import random
 # Run this app to run only the website
 app = Dash(__name__)
+colorlist=['#e9b497', '#01f55b', '#269d2b', '#12d16d', '#b06d68', '#a1c07e', '#40b244', '#dd1462', '#efc646', '#ea03b9', '#77f109', '#ed3176', '#cd0361', '#4c84f5', '#287b5e', '#c34fc8', '#0c8bcb', '#b0deaf', '#cf1e3b', '#08c99e', '#028b6e', '#1015c5', '#f16e26', '#1a71f0', '#5c3fd1', '#3b7a20', '#fdb152', '#ee93e4', '#cda688', '#6dd905', '#63acbc', '#5dc0d4', '#655a9d', '#e67844', '#23a032', '#fd7f1c', '#06dbd9', '#dd7755', '#af71ef', '#e1839a', '#3d1a49', '#bce2d5', '#2de0f2', '#5f1c73', '#4f13ef', '#61995d', '#ae49e5', '#fcb7b2', '#ac255a', '#b31585', '#84a814', '#5c82f1', '#c6d703', '#91421b', '#67bf2b', '#d190dc', '#47e918', '#83b0b2', '#d380c8', '#dd2f12', '#1c4b0b', '#d414d2', '#d937cd', '#82c78e', '#a1a8d9', '#2a75a8', '#8e2e14', '#2e408d', '#fd3251', '#b1c4d8', '#e78f09', '#5e3e9d', '#f1c0ca', '#b3a799', '#793aad', '#fe9a90', '#c24d85', '#b8c639', '#bdf1ad', '#81bda4', '#fac533', '#f3e076', '#3a6a27', '#58c6ad', '#e52f2f', '#7dbdbb', '#3fd4b3', '#2384c7', '#03cfa1', '#4482c0', '#c2e8b5', '#316d6b', '#f3e342', '#6471dc', '#8c9f6b', '#03a308', '#bd9a0d', '#2ba27a', '#c5b45a', '#e3b5e3', '#79d449', '#18ddc4', '#d62088', '#d9ca7f', '#feb296', '#76de2f', '#6c7199', '#2557c4', '#d9f5ee', '#dbf0e4', '#f69d32', '#6cbf8e', '#fa0cf1', '#69e196', '#95e46b', '#0e1e96', '#ccd891', '#7b9b4a', '#d80c3c', '#ead2e0', '#a4756f', '#25a085', '#a4bde0', '#f4cde1', '#3656d9', '#026ef5', '#0ee3aa', '#fbe3bc', '#e0dabf', '#2e20a2', '#caaf46', '#cc1595', '#4ee55d', '#0bf29c', '#bb09b9', '#5ab0b7', '#6d6711', '#632285', '#92fb8e', '#3b08c2', '#ec6a3a', '#a3e0cc', '#051c9b', '#ad3778', '#ad0845', '#b57679', '#517589', '#0e07a3', '#29a5af', '#9e9ad0', '#d9f706', '#b1ad4e', '#905b62', '#7db8b2', '#f2763c', '#f37ee7', '#f2564a', '#bdbe1a', '#efb1aa', '#f46c2b', '#037dff', '#e08bf7', '#5ca409', '#e1e30b', '#7c53dc', '#7b9f6c', '#df8f51', '#44cb7e', '#40fd5e', '#fca24b', '#f6f935', '#f6f271', '#1f0f4d', '#18d781', '#a101b1', '#6c5b9f', '#3dc3a1', '#bbf03f', '#aa9aeb', '#fd54d8', '#e7af70', '#7855b0', '#f8f90e', '#6aa236', '#7a7612', '#c23318', '#3cc79e', '#9b730e', '#9cf4ed', '#a43c17', '#d0a4f5', '#cf98d0', '#57919f', '#6cd0f0', '#bc538e', '#cf78f8', '#d0f7db', '#07fe4b', '#5ccaf7', '#b2817d', '#f2e3a9', '#7a90f2', '#88b1f7', '#558bdf', '#7e69f9', '#ee44e1', '#68f3e9', '#c0cd29', '#a64aee', '#f6d241', '#31750c', '#0d570d', '#1c17dc', '#ed5c0b', '#46c87b', '#91aaf9', '#671eac', '#808883', '#5f1084', '#f052ee', '#b03fa4', '#56c17e', '#204572', '#2c54da', '#96a5ec', '#90fbf2', '#c69aa0', '#ce562f', '#e3e472', '#e4a649', '#aa4e5d', '#d0832d', '#75480e', '#e1fb61', '#3e1850', '#dbf7e2', '#ad7e36', '#76ab9c', '#b9be1c', '#cab6f2', '#71f028', '#93e5c0', '#4be41f', '#f9b178', '#7be8dc', '#59e10c', '#8d9f8e', '#5dfc8c', '#e1ab07', '#d75cc3', '#0d2c59', '#cd49ee', '#5186e4', '#e76ed1', '#0ed3ff', '#bdf671', '#9f1464', '#8b3143', '#18f881', '#30569b', '#9ad0ab', '#dab8b9', '#81ecff', '#16b579', '#ff8ac8', '#e5d6d2', '#36428c', '#63749e', '#a7598b', '#1a62ec', '#8f4e99', '#f5e7cf', '#7ccf5a', '#d00f8a', '#82e42f', '#31d924', '#c7c593', '#8e24cd', '#a73d3b', '#4acfd7', '#e3467f', '#9ab8e9', '#5eaf40', '#6a7d7d', '#e91b28', '#a49d38', '#5d047d', '#2fafe6', '#d26aa5', '#3726ec', '#9d0d02', '#e57f1f', '#e21d36', '#c1febf', '#7584d5', '#e7fe5e', '#90a3f1', '#73f77f', '#e460bc', '#79d255', '#8aefeb', '#1a5a1c', '#15a623', '#fb650d', '#cff157', '#d9b6c2', '#d8b82c', '#2d1ad0', '#dcc07c', '#529da9', '#174b85', '#5d8ef0', '#f0be63', '#036f30', '#e9f7b4', '#7f3d26', '#d48db5', '#17b354', '#fdab86', '#032a2a', '#c4d876', '#04a28a', '#cf9f55', '#756e3b', '#f9e0e7', '#ea68bb', '#e2441c', '#8c64b4', '#c3615a', '#ef4f76', '#f929b5', '#4c6897', '#f3de6b', '#078160', '#2f2ee6', '#9e8657', '#14f47b', '#70e228', '#e40f94', '#0c88bc', '#fbf2f3', '#2d69dc', '#c31a2b', '#b8f64d', '#ed5e68', '#d91cd4', '#3febd0', '#63e0db', '#e18f3d', '#034089', '#cad6d1', '#fd5a4b', '#8a65f0', '#e14b0c', '#a1ee72', '#ac3a1d', '#a4cfc8', '#3c52c3', '#fd4dbf', '#bc3fe8', '#4b41c3', '#d28589', '#07f07f', '#4ab140', '#ff7911', '#8c2364', '#fb8cfb', '#4fcac4', '#2a36df', '#f6f67e', '#fd60f3', '#848cb5', '#6f6e7d', '#d953fc', '#c7d2fd', '#a70e36', '#2a6ce8', '#2bbed0', '#adcfdd', '#6742e7', '#f2f85a', '#88784b', '#15f539', '#fb4a81', '#01a7d5', '#c52017', '#41afac', '#e54d19', '#23ac43', '#d320a3', '#7841bc', '#08fd1a', '#22e4b5', '#1cd675', '#1d4cd5', '#d2d9c7', '#f9cda1', '#f4f3cc', '#7a4bc2', '#3eddd6']
 
 # ################################# LOAD DATA ################################
-grant_to_people_df = pd.read_csv('dcia/static/data/grants_to_people.csv')
-people_to_people_df = pd.read_csv('dcia/static/data/people_to_people.csv')
-people_att_table_df = pd.read_csv('dcia/static/data/people_att_table.csv', sep="\t")
-people_att_table_df.set_index('Node', inplace = True)
-to_att_df = pd.read_csv('dcia/static/data/grant_att_table.csv')
-to_att_df.set_index('Node', inplace = True)
-
+people_to_people_df, grant_to_people_df,from_att_df,to_att_df=load_data()
+data_types = check_data_types(from_att_df)
+data_types2 = check_data_types(to_att_df)
+first_key, first_value = next(iter(data_types.items()))
+second_key, second_value = next(iter(data_types.items()))
 # ############################## PREPROCESS DATA #############################
 # Drop druplicates
 edge_data = grant_to_people_df.drop_duplicates(keep="first").reset_index(drop=True)
@@ -32,64 +35,97 @@ nodes = set()
 
 cyto_edges = []
 cyto_nodes = []
-
 for index, edge in edge_data.iterrows():
-    for node_key in ['from', 'to']:  # Process both 'from' and 'to' columns
+    for node_key in ['from','to']:  # Process both 'from' and 'to' columns
         node_id = edge[node_key]
-
 
         if node_id not in nodes:
             nodes.add(node_id)
             node_data = {'id': str(node_id), 'label': str(node_id)}
 
-
             # Check if the node is in the people attributes table
-            if node_id in people_att_table_df.index:
-                node_attributes = people_att_table_df.loc[node_id].dropna().to_dict()
+            if node_id in from_att_df.index:
+                size_node=from_att_df[from_att_df['Node']==node_id].reset_index(drop=True).loc[0,'Node_Size']
+                node_attributes = from_att_df.loc[node_id].dropna().to_dict()
                 node_data.update(node_attributes)
                 node_data['type'] = "person"
-
-
-            # Check if the node is in the grant attributes table
-            elif node_id in to_att_df.index:
+                node_data['size'] = str(15+25*size_node) +'px'
+                node_data['color'] ='red'
+                
+            if node_id in to_att_df.index:
+                size_node=to_att_df[to_att_df['Node']==node_id].reset_index(drop=True).loc[0,'Node_Size']
                 node_attributes = to_att_df.loc[node_id].dropna().to_dict()
                 node_data.update(node_attributes)
                 node_data['type'] = "grant"
+                node_data['size'] = str(15+25*size_node) +'px'
+                node_data['color'] ='blue'     
 
             cyto_nodes.append({'data': node_data})
 
-    # Create edge
     cyto_edges.append({
         'data': {
             'source': str(edge['from']),
             'target': str(edge['to'])
         }
     })
-  
+# Create an empty list to collect the filtered data
+filtered_data = []
+filtered_data2 = []
+
+# Iterate over each dictionary in the list
+for item in cyto_nodes:
+    # Check if the color is either 'red' or 'blue'
+    if item['data']['color'] in ['blue']:
+        # Append the dictionary to the filtered_data list
+        filtered_data.append(item['data'])
+    else:
+        filtered_data2.append(item['data'])
+# Create a DataFrame from the filtered data
+to_df = pd.DataFrame(filtered_data)
+from_df=pd.DataFrame(filtered_data2)
+# Select the first key-value pair
 default_elements = cyto_edges + cyto_nodes
 
 # ############################## MAKE DEFAULT STYLESHEET #############################
 
+
+
 default_stylesheet = [
     {
-        "selector": "node",
-        "style": {
-            "opacity": 0.65
+            'selector': f'node[type = "person"]',
+            'style': {
+                'background-color': 'red',
+                 "opacity": 0.55,
+            'width': 'data(size)',
+            'height': 'data(size)',
+            "shape": 'ellipse',# Generate a unique random color for each node
+            }
         },
+    {
+        "selector": f'node[type = "grant"]', 
+        "style": {
+            "opacity": 0.55,
+            'width': 'data(size)',
+            'height': 'data(size)',
+            "shape": 'diamond',
+            'background-color': 'blue'
+        }
     },
     {
         "selector": "edge",
         "style": {
-            "curve-style": "bezier",
-            "opacity": 0.65
+            "curve-style": "bezier", 
+            'opacity': 0.2,
+            'width': "2",
         }
     }
 ]
-
 styles = {
     "json-output": {
         "overflow-y": "scroll",
-        "height": "calc(50% - 25px)",
+        "overflow-x": "scroll",
+        "height": "calc(90% - 25px)",
+        "width": "350px",
         "border": "thin lightgrey solid",
     },
     "tab": {"height": "calc(98vh - 115px)"},
@@ -122,11 +158,30 @@ app.layout = html.Div(
                             children=[
                                 html.Div(
                                     children = [
-                                        html.P(children = "Graph layout:",
+                                        html.P(children = "Graph filters:",
                                                 style={
                                                     "marginLeft": "3px"
                                                     }
                                                 ),
+                                        html.P("Node filter for persons:"),
+                                        dcc.Dropdown(
+                                        id='color-dropdown',
+                                        options=[
+                                                                {
+                                                                    'label': key,
+                                                                    'value': key} for key,value in data_types.items()],
+                                        value=None  # Default color selection
+                                        ),
+                                        html.P("Node filter for grants:"),
+                                        dcc.Dropdown(
+                                        id='color-dropdown2',
+                                        options=[
+                                                                {
+                                                                    'label': key,
+                                                                    'value': key} for key,value in data_types2.items()],
+                                        value=None  # Default color selection
+                                        ),
+                                        html.P("graph layout:"),
                                         dcc.Dropdown(
                                             id = "dropdown-layout",
                                             options = [
@@ -327,11 +382,61 @@ def get_triggered_id():
         Input("input-source-color", "value"),
         Input("input-target-color", "value"),
         Input("search-input", "value"),
-        Input("cytoscape", "tapNode")
+        Input("cytoscape", "tapNode"),
+        Input('color-dropdown', 'value'),
+        Input('color-dropdown2', 'value')
     ],   
 )
-def generate_stylesheet(person_shape, grant_shape, source_color, target_color, search_value, node):
+def generate_stylesheet(person_shape, grant_shape, source_color, target_color, search_value, node,color_dropdown,color_dropdown2):
     triggered_id = get_triggered_id()
+    if triggered_id == "color-dropdown" or triggered_id == "color-dropdown2":
+        drop_down_type = data_types.get(color_dropdown)
+        first_df=get_colors(from_df,color_dropdown,drop_down_type)
+        new_stylesheet = [
+            {
+                'selector': f'node[id="{row["id"]}"]',
+                'style': {
+                 "opacity": 0.55,
+                    'width': 'data(size)',
+                    'height': 'data(size)',
+                    "shape": person_shape,
+                    'background-color': row['color'],  # Set a random color for each node of type "person"
+                }
+            }
+            for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
+        ]
+        
+        drop_down_type2 = data_types2.get(color_dropdown2)
+        second_df=get_colors2(to_df,color_dropdown2,drop_down_type2)
+        new_stylesheet += [
+            {
+                'selector': f'node[id="{row["id"]}"]',
+                'style': {
+                 "opacity": 0.55,
+                    'width': 'data(size)',
+                    'height': 'data(size)',
+                    "shape": grant_shape,
+                    'background-color': row['color'],  # Set a random color for each node of type "person"
+                }
+            }
+            for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
+        ]
+        
+        
+        new_stylesheet += [
+            {
+                    "selector": "edge",
+                    "style": {
+                        "opacity": 0.2,
+                        "curve-style": "bezier",
+                    }}]
+        
+        
+        return new_stylesheet
+    
+    
+    
+    
     if triggered_id == "search-input":
         if not search_value:
             if not node:
@@ -341,21 +446,23 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 {
                     "selector": 'node[type = "person"]', 
                     "style": {
-                        "opacity": 0.9, 
+                        "opacity": 0.55,'width': 'data(size)',
+                        'height': 'data(size)',
                         "shape": person_shape
                         }
                 },
                 {
                     "selector": 'node[type = "grant"]', 
                     "style": {
-                        "opacity": 0.9, 
+                        "opacity": 0.55,'width': 'data(size)',
+                        'height': 'data(size)',
                         "shape": grant_shape
                         }
                 },
                 {
                     "selector": "edge",
                     "style": {
-                        "opacity": 0.9,
+                        "opacity": 0.2,
                         "curve-style": "bezier",
                     },
                 },
@@ -372,6 +479,9 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "text-opacity": 1,
                         "font-size": 12,
                         "z-index": 9999,
+                        
+                        "text-opacity": 0.8,
+                    "font-size": 12,
                     },
                 },
             ]
@@ -383,6 +493,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'node[id = "{edge["target"]}"]',
                             "style": {
                                 "background-color": target_color, 
+                                
                                  "opacity": 0.9,
                                   "z-index": 9999},
                         }
@@ -406,6 +517,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'node[id = "{edge["source"]}"]',
                             "style": {
                                 "background-color": source_color,
+                                
                                 "opacity": 0.9,
                                 "z-index": 9999,
                             },
@@ -529,21 +641,24 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
             {
                 "selector": 'node[type = "person"]', 
                 "style": {
-                    "opacity": 0.9, 
+                   "opacity": 0.55,'width': 'data(size)',
+                    'height': 'data(size)',
                     "shape": person_shape
                     }
             },
             {
                 "selector": 'node[type = "grant"]', 
                 "style": {
-                    "opacity": 0.9, 
+                    "opacity": 0.55,'width': 'data(size)',
+                    'height': 'data(size)',
                     "shape": grant_shape
                     }
             },
             {
                 "selector": "edge",
                 "style": {
-                    "opacity": 0.9,
+                    'opacity':0.2,
+                    'width': "2",
                     "curve-style": "bezier",
                 },
             },
@@ -560,6 +675,9 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     "text-opacity": 1,
                     "font-size": 12,
                     "z-index": 9999,
+                    'width': 'data(size)',
+                    'height': 'data(size)',
+
                 },
             },
         ]
@@ -569,7 +687,8 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 stylesheet.append(
                     {
                         "selector": f'node[id = "{edge["target"]}"]',
-                        "style": {"background-color": target_color, "opacity": 0.9},
+                        "style": {"background-color": target_color,"label": "data(label)","text-opacity": 0.8,
+                    "font-size": 12, "opacity": 0.9},
                     }
                 )
                 stylesheet.append(
@@ -591,8 +710,13 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "selector": f'node[id = "{edge["source"]}"]',
                         "style": {
                             "background-color": source_color,
+                            "label": "data(label)",
+                            "text-opacity": 0.8,
+                            "font-size": 12,
                             "opacity": 0.9,
                             "z-index": 9999,
+                            'width': 'data(size)',
+                            'height': 'data(size)',
                         },
                     }
                 )
@@ -618,9 +742,11 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
 def update_input_color(input_value):
     return {"color": input_value}
 
+
 @callback(Output("cytoscape", "layout"), Input("dropdown-layout", "value"))
 def update_cytoscape_layout(layout):
     return {"name": layout}
+    
 
 @callback(
     Output("cytoscape", "elements", allow_duplicate=True),
@@ -655,7 +781,17 @@ def reset_layout(n_clicks_bt_reset, n_clicks_bt_reset1):
     Input("cytoscape", "selectedNodeData"),
 )
 def displaySelectedNodeData(data):
-    return json.dumps(data, indent=2)
+    if data and data!=None:
+        for i in range(len(data)):
+            
+            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+            if i==0:
+                tables=[table1,]                                                                
+            else:
+                tables.extend([table1,])
+        return tables
+    raise PreventUpdate                                                                                                 
+
 
 @app.callback(
     Output('dropdown-node-shape-person', 'options'),
