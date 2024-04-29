@@ -80,15 +80,15 @@ for item in cyto_nodes:
         filtered_data.append(item['data'])
     else:
         filtered_data2.append(item['data'])
+        
 # Create a DataFrame from the filtered data
 to_df = pd.DataFrame(filtered_data)
 from_df=pd.DataFrame(filtered_data2)
+
 # Select the first key-value pair
 default_elements = cyto_edges + cyto_nodes
 
 # ############################## MAKE DEFAULT STYLESHEET #############################
-
-
 
 default_stylesheet = [
     {
@@ -131,16 +131,51 @@ styles = {
     "tab": {"height": "calc(98vh - 115px)"},
 }
 
-# ############################## APP LAYOUT #############################
+style_buttons = {"backgroundColor": "#f8f9fa",
+        "border": "1px solid #dfe0e1",
+        "borderRadius": "4px",
+        "color": "#3c4043",
+        "cursor": "pointer",
+        "fontFamily": "alegreya sans, sans-serif",
+        "fontSize": "14px",
+        "height": "36px",
+        "lineHeight": "27px",
+        "minWidth": "54px",
+        "padding": "0 16px",
+        "textAlign": "center",
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+        "touchAction": "manipulation",
+        "whiteSpace": "pre"}
+
+style_tabs = {"backgroundColor": "#f8f9fa",
+        "border": "1px solid #adaeaf",
+        "borderRadius": "4px",
+        "color": "#3c4043",
+        "cursor": "pointer",
+        "fontFamily": "alegreya sans, sans-serif",
+        "fontSize": "14px",
+        "lineHeight": "55px",
+        "minWidth": "10px",
+        "padding": "0 16px",
+        "textAlign": "center",
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+        "touchAction": "manipulation",
+        "whiteSpace": "pre",
+        'width': 'auto'}
 
 def collect_node_attributes():
     attributes = set()
     for node in cyto_nodes:
         attributes.update(node['data'].keys())
     # Exclude common keys like 'id' and 'label' that are not useful for filtering
-    return list(attributes - {'id', 'label'})
+    return list(attributes - {'id', 'label', 'Node_Size', 'size', 'type', 'color', 'Node', 'Connected nodes', 'size index', 'index'})
 
 node_attributes = collect_node_attributes()
+
+
+# ############################## APP LAYOUT #############################
 
 app.layout = html.Div(
     style = {
@@ -152,36 +187,16 @@ app.layout = html.Div(
                children = [
                    dcc.Tabs(
                     id="tabs",
+                    style = {"fontFamily": "alegreya sans, sans-serif",
+                             'width': 'auto'},
                     children=[
                         dcc.Tab(
                             label="Layout",
+                            style = style_tabs,
                             children=[
                                 html.Div(
                                     children = [
-                                        html.P(children = "Graph filters:",
-                                                style={
-                                                    "marginLeft": "3px"
-                                                    }
-                                                ),
-                                        html.P("Node filter for persons:"),
-                                        dcc.Dropdown(
-                                        id='color-dropdown',
-                                        options=[
-                                                                {
-                                                                    'label': key,
-                                                                    'value': key} for key,value in data_types.items()],
-                                        value=None  # Default color selection
-                                        ),
-                                        html.P("Node filter for grants:"),
-                                        dcc.Dropdown(
-                                        id='color-dropdown2',
-                                        options=[
-                                                                {
-                                                                    'label': key,
-                                                                    'value': key} for key,value in data_types2.items()],
-                                        value=None  # Default color selection
-                                        ),
-                                        html.P("graph layout:"),
+                                        html.P("Graph layout:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                         dcc.Dropdown(
                                             id = "dropdown-layout",
                                             options = [
@@ -194,12 +209,13 @@ app.layout = html.Div(
                                                 ],
                                             value = "cose-bilkent",
                                             clearable = False,
+                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
                                         ),
                                     ],
                                 ),
                                 html.Div( 
                                     children = [
-                                        html.P("Node shape for persons:"),
+                                        html.P("Node shape for persons:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                         dcc.Dropdown(
                                             id="dropdown-node-shape-person",
                                             options=[
@@ -216,8 +232,9 @@ app.layout = html.Div(
                                             ],
                                             value="ellipse", 
                                             clearable = False,
+                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
                                         ),
-                                        html.P("Node shape for grants:"),
+                                        html.P("Node shape for grants:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                         dcc.Dropdown(
                                             id="dropdown-node-shape-grant",
                                             options=[
@@ -234,6 +251,7 @@ app.layout = html.Div(
                                             ],
                                             value="diamond",
                                             clearable = False, 
+                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
                                         ),
                                         html.Div([
                                         dcc.Store(id='shape-store', 
@@ -245,7 +263,8 @@ app.layout = html.Div(
                                     children = [
                                         html.P(children = "Color of persons:", 
                                             style ={
-                                                "marginLeft": "3px"
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                             ),
                                         dcc.Input(
@@ -253,7 +272,8 @@ app.layout = html.Div(
                                             type="text",
                                             value="#0074D9",
                                             style = {
-                                                "color": "#0074D9"
+                                                "color": "#0074D9",
+                                                "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                         ),
                                     ],
@@ -263,7 +283,8 @@ app.layout = html.Div(
                                     children = [
                                         html.P(children = "Color of grants:", 
                                             style = {
-                                                "marginLeft": "3px"
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                             ),
                                         dcc.Input(
@@ -271,7 +292,8 @@ app.layout = html.Div(
                                             type="text",
                                             value="#FF4136",
                                             style = {
-                                                "color": "#FF4136"
+                                                "color": "#FF4136",
+                                                "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                         ),
                                     ],
@@ -280,14 +302,16 @@ app.layout = html.Div(
                             ),
                         dcc.Tab(
                             label="Filters",
+                            style = style_tabs,
                             children=[
                                 html.Div(
                                     style = styles["tab"],
                                     children=[
-                                        html.Button("Reset", id = "bt-reset"),
+                                        html.Button("Reset", id = "bt-reset", style = style_buttons,),
                                         html.P(children = "Search for person or grant:", 
                                             style = {
-                                                "marginLeft": "3px"
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                             ),
                                         dcc.Input(
@@ -295,43 +319,97 @@ app.layout = html.Div(
                                             type="text",
                                             placeholder = "Type to search..."
                                         ),
+                                        html.P(children = "Graph Color Filters:",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontWeight": "bold",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
+                                        html.P("Node filter for persons:" , style = {"fontFamily": "alegreya sans, sans-serif"}),
+                                        dcc.Dropdown(
+                                        id='color-dropdown',
+                                        options=[
+                                                                {
+                                                                    'label': key,
+                                                                    'value': key} for key,value in data_types.items()],
+                                        value=None, # Default color selection
+                                        style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                        ),
+                                        html.P("Node filter for grants:", style = {"fontFamily": "alegreya sans, sans-serif"}),
+                                        dcc.Dropdown(
+                                        id='color-dropdown2',
+                                        options=[
+                                                                {
+                                                                    'label': key,
+                                                                    'value': key} for key,value in data_types2.items()],
+                                        value=None ,  # Default color selection
+                                        style = {"fontFamily": "alegreya sans, sans-serif"}
+                                        ),
+                                        html.P(children = "Graph Filters:",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontWeight": "bold",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
+                                        html.P(children = "Select Node Attribute:",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
                                         dcc.Store(id = "filter-history-store"),
                                         html.Div(
                                             style = 
                                             styles['tab'],
                                             children= [
                                                 html.Div([
-                                                    html.Label('Select Node Attribute:'),
                                                     dcc.Dropdown(
                                                         id='node-attribute-dropdown',
-                                                            options=[
+                                                            options= [
                                                                 {
                                                                     'label': attr,
                                                                     'value': attr} for attr in node_attributes],
-                                                            value = None
+                                                                    
+                                                            value = None,
+                                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
                                                     ),
-                                                    html.Label("Select Attribute Value:"),
-                                                    dcc.Dropdown(id = "attribute-value-dropdown"),
+                                        html.P(children = "Select Attribute value:",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
+                                                    dcc.Dropdown(id = "attribute-value-dropdown", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                                 ]),
                                                 html.Div(id = "filter-output",
                                                          style = {
-                                                            'margin-top': '20px'
-                                                        })
+                                                            'margin-top': '20px',
+                                                            "fontFamily": "alegreya sans, sans-serif"
+                                                        }),
+                                        html.P("Information of Selected Nodes:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
+                                            html.Pre(
+                                                id="selected-node-data-json-output-filter",
+                                                style=styles["json-output"],
+                                            )
                                             ]
                                         )
                                         ]
-                                    )
+                                    ),
+                                
                                 ]
                             ),
                             dcc.Tab(
                                 label="Remove Nodes",
+                                style = style_tabs,
                                 children=[
-                                    html.Button("Remove Selected Node", id="remove-button"),
-                                    html.Button("Reset", id = "bt-reset1"),
+                                    html.Button("Remove Selected Node", id="remove-button", style = style_buttons,),
+                                    html.Button("Reset", id = "bt-reset1", style = style_buttons),
                                     html.Div(
                                         style=styles["tab"],
                                         children=[
-                                            html.P("Node Data JSON:"),
+                                            html.P("Information of Selected Nodes:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                             html.Pre(
                                                 id="selected-node-data-json-output",
                                                 style=styles["json-output"],
@@ -770,15 +848,17 @@ def remove_selected_nodes(_, elements, data):
     Output("cytoscape", "elements", allow_duplicate=True),
     Output("search-input", "value"),
     Output('filter-output', 'children', allow_duplicate=True),
+    Output('filter-history-store', 'data', allow_duplicate=True),
    [Input("bt-reset", "n_clicks"), Input("bt-reset1", "n_clicks")],
     prevent_initial_call = True
 )
 def reset_layout(n_clicks_bt_reset, n_clicks_bt_reset1):
-    return default_elements, "", ""
+    return default_elements, "", "", []
 
 @callback(
-    Output("selected-node-data-json-output", "children"),
+    Output("selected-node-data-json-output", "children", allow_duplicate=True),
     Input("cytoscape", "selectedNodeData"),
+    prevent_initial_call = True
 )
 def displaySelectedNodeData(data):
     if data and data!=None:
@@ -791,6 +871,23 @@ def displaySelectedNodeData(data):
                 tables.extend([table1,])
         return tables
     raise PreventUpdate                                                                                                 
+
+@callback(
+    Output("selected-node-data-json-output-filter", "children", allow_duplicate=True),
+    Input("cytoscape", "selectedNodeData"),
+    prevent_initial_call = True
+)
+def displaySelectedNodeData(data):
+    if data and data!=None:
+        for i in range(len(data)):
+            
+            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+            if i==0:
+                tables=[table1,]                                                                
+            else:
+                tables.extend([table1,])
+        return tables
+    raise PreventUpdate 
 
 
 @app.callback(
