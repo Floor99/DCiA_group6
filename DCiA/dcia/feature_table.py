@@ -40,7 +40,7 @@ def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
             style={
                 'borderCollapse': 'collapse',
                 'border': '1px solid black',
-                'fontFamily': 'Arial, sans-serif',
+                'fontFamily': "alegreya sans, sans-serif",
                 'fontSize': '16px',
                 'textAlign': 'center',
                 'marginRight': '10px',
@@ -55,11 +55,12 @@ def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
             style={
                 'borderCollapse': 'collapse',
                 'border': '1px solid black',
-                'fontFamily': 'Arial, sans-serif',
+                'fontFamily': "alegreya sans, sans-serif",
                 'fontSize': '16px',
                 'textAlign': 'center',
                 'marginRight': '10px'
-            , 'marginBottom': '10px',   
+            , 'marginBottom': '10px', 
+            'background-color': '#dfe0e1',  
             'width': '100%',
             'table-layout': 'fixed',
             'justify-content': 'space-between'}
