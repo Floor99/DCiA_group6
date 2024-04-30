@@ -84,6 +84,10 @@ def faqs():
 def contact():
     return render_template('contact.html')
 
+@app.route('/grant_applications_expansion')
+def grant_applications_expansion():
+    return render_template('grant_applications_expansion.html')
+
 # @app.route('/dash/')
 # def dash():
 #     return render_template('dash.html')

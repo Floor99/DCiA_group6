@@ -168,36 +168,9 @@ default_elements = [genesis_node]
 ################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
 control_panel = dcc.Tab(
-    label="Control Panel",
+    label="Explore network",
     children=[
-        NamedDropdown(
-            name="Layout",
-            id="dropdown-layout",
-            options=DropdownOptionsList(
-                "random",
-                "grid",
-                "circle",
-                "concentric",
-                "breadthfirst",
-                "cose",
-                "cose-bilkent",
-                "dagre",
-                "cola",
-                "klay",
-                "spread",
-                "euler",
-            ),
-            value="cose-bilkent",
-            clearable=False,
-        ),
-        NamedRadioItems(
-            name="Expand",
-            id="radio-expand",
-            options=DropdownOptionsList(
-                "People", "Grant"
-            ),
-            value="People",
-        ),
+        html.Br(),
         html.P(
             children = "Search for person or grant:",
             style = {
@@ -208,7 +181,35 @@ control_panel = dcc.Tab(
                 id="search-input",
                 type="text",
                 placeholder = "Type to search..."
-            )
+            ),
+        NamedDropdown(
+            name="Layout",
+            id="dropdown-layout",
+            options=DropdownOptionsList(
+                "random",
+                "grid",
+                # "circle",
+                # "concentric",
+                # "breadthfirst",
+                # "cose",
+                "Default (cose-bilkent)",
+                # "dagre",
+                # "cola",
+                # "klay",
+                # "spread",
+                # "euler",
+            ),
+            value="Default (cose-bilkent)",
+            clearable=False,
+        ),
+        NamedRadioItems(
+            name="Expand",
+            id="radio-expand",
+            options=DropdownOptionsList(
+                "People", "Grant"
+            ),
+            value="People",
+        ),
     ],
 )
 json_panel = dcc.Tab(
@@ -289,6 +290,7 @@ app.layout = html.Div(
     style=
     {
         "display": "flex",
+        "padding": "15px",
         "flexDirection": "row",
         "width": "100%"
     },
@@ -395,4 +397,4 @@ def display_tap_edge(data):
     return json.dumps(data, indent=2) if data else ""
 
 if __name__ == "__main__":
-    app.run_server(debug=True,port = 5002)
+    app.run_server(debug=False, port = 5002)
