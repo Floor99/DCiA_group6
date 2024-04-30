@@ -6,7 +6,7 @@ def interpolate_color(color1, color2, factor):
     r = int(color1[0] * (1 - factor) + color2[0] * factor)
     g = int(color1[1] * (1 - factor) + color2[1] * factor)
     b = int(color1[2] * (1 - factor) + color2[2] * factor)
-    return (r, g, b)
+    return f'rgb({r}, {g}, {b})'
 
 def number_to_rgb_gradient(number, min_val, max_val,csv):
     """ Convert number to RGB gradient """
