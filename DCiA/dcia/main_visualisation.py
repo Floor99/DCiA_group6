@@ -148,6 +148,7 @@ style_buttons = {"backgroundColor": "#f8f9fa",
         "lineHeight": "27px",
         "minWidth": "54px",
         "padding": "0 16px",
+        "margin-top": "15px",
         "textAlign": "center",
         "userSelect": "none",
         "-webkit-user-select": "none",
@@ -160,7 +161,7 @@ style_tabs = {"backgroundColor": "#f8f9fa",
         "color": "#3c4043",
         "cursor": "pointer",
         "fontFamily": "alegreya sans, sans-serif",
-        "fontSize": "14px",
+        "fontSize": "15px",
         "lineHeight": "55px",
         "minWidth": "10px",
         "padding": "0 16px",
@@ -184,7 +185,8 @@ node_attributes = collect_node_attributes()
 
 app.layout = html.Div(
     style = {
-        'display' : 'flex'
+        'display' : 'flex',
+        'padding': '15px',
         },
     children =[
         dcc.Store(id='current-stylesheet', data=default_stylesheet),
@@ -202,24 +204,53 @@ app.layout = html.Div(
                             children=[
                                 html.Div(
                                     children = [
-                                        html.Button("Deselect Node", id="bt-undo", style = style_buttons),
-                                        html.P("Graph layout:", style = {"fontFamily": "alegreya sans, sans-serif"}),
-                                        dcc.Dropdown(
-                                            id = "dropdown-layout",
-                                            options = [
-                                                {'label': 'Breadth-first', 'value': 'breadthfirst'},
-                                                {'label': 'Circle', 'value': 'circle'},
-                                                {'label': 'Concentric', 'value': 'concentric'},
-                                                {'label': 'Cose-bilkent', 'value': 'cose-bilkent'},
-                                                {'label': 'Grid', 'value': 'grid'},
-                                                {'label': 'Random', 'value': 'random'}
-                                                ],
-                                            value = "cose-bilkent",
-                                            clearable = False,
-                                            style = {"fontFamily": "alegreya sans, sans-serif"}
-                                        ),
+                                    # html.P("You can select a node by clicking on it, if you want to deselect a node click the button below.", style = {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}),
+                                    html.Button("Deselect Node", id="bt-undo", style = style_buttons),
                                     ],
                                 ),
+                                # html.P("________________________________________________________", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
+                                html.P("Color and shape of nodes", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
+                                html.P("Determine the layout of your network. Pick a color and shape for the people and the grants in the network.", style = {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}),
+                                html.Div(
+                                    style = {"margin": "10px 0px"},
+                                    children = [
+                                        html.P(children = "Color of persons:",
+                                            style ={
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif"
+                                                }
+                                            ),
+                                        dcc.Input(
+                                            id="input-source-color",
+                                            type="text",
+                                            value="#0074D9",
+                                            style = {
+                                                "color": "#0074D9",
+                                                "fontFamily": "alegreya sans, sans-serif"
+                                                }
+                                        ),
+                                    ],
+                                    ),
+                                html.Div(
+                                    style = {"margin": "10px 0px"},
+                                    children = [
+                                        html.P(children = "Color of grants:",
+                                            style = {
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif"
+                                                }
+                                            ),
+                                        dcc.Input(
+                                            id="input-target-color",
+                                            type="text",
+                                            value="#FF4136",
+                                            style = {
+                                                "color": "#FF4136",
+                                                "fontFamily": "alegreya sans, sans-serif"
+                                                }
+                                        ),
+                                    ],
+                                    ),
                                 html.Div(
                                     children = [
                                         html.P("Node shape for persons:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
@@ -263,48 +294,31 @@ app.layout = html.Div(
                                         html.Div([
                                         dcc.Store(id='shape-store',
                                                   data={'person_shape': 'ellipse', 'grant_shape': 'diamond'})])
+                                        ,
+                                        html.Br(),
                                         ],
                                 ),
+                                # html.P("_______________________________________________", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
                                 html.Div(
-                                    style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of persons:",
-                                            style ={
-                                                "marginLeft": "3px",
-                                                "fontFamily": "alegreya sans, sans-serif"
-                                                }
-                                            ),
-                                        dcc.Input(
-                                            id="input-source-color",
-                                            type="text",
-                                            value="#0074D9",
-                                            style = {
-                                                "color": "#0074D9",
-                                                "fontFamily": "alegreya sans, sans-serif"
-                                                }
+                                        html.P("Graph layout", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
+                                        html.P("You can also change the layout of the network to see the people and grants spread out in a different way.", style = {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}),
+                                        dcc.Dropdown(
+                                            id = "dropdown-layout",
+                                            options = [
+                                                # {'label': 'Breadth-first', 'value': 'breadthfirst'},
+                                                # {'label': 'Circle', 'value': 'circle'},
+                                                # {'label': 'Concentric', 'value': 'concentric'},
+                                                {'label': 'Default (Cose-bilkent)', 'value': 'cose-bilkent'},
+                                                {'label': 'Grid', 'value': 'grid'},
+                                                {'label': 'Random', 'value': 'random'}
+                                                ],
+                                            value = "cose-bilkent",
+                                            clearable = False,
+                                            style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
                                     ],
-                                    ),
-                                html.Div(
-                                    style = {"margin": "10px 0px"},
-                                    children = [
-                                        html.P(children = "Color of grants:",
-                                            style = {
-                                                "marginLeft": "3px",
-                                                "fontFamily": "alegreya sans, sans-serif"
-                                                }
-                                            ),
-                                        dcc.Input(
-                                            id="input-target-color",
-                                            type="text",
-                                            value="#FF4136",
-                                            style = {
-                                                "color": "#FF4136",
-                                                "fontFamily": "alegreya sans, sans-serif"
-                                                }
-                                        ),
-                                    ],
-                                    ),
+                                ),
                                 ],
                             ),
                         dcc.Tab(
@@ -316,25 +330,42 @@ app.layout = html.Div(
                                     children=[
                                         html.Button("Reset", id = "bt-reset", style = style_buttons,),
                                         html.Button("Deselect Node", id="bt-undo1", style = style_buttons),
-                                        html.P(children = "Search for person or grant:",
-                                            style = {
-                                                "marginLeft": "3px",
-                                                "fontFamily": "alegreya sans, sans-serif"
-                                                }
-                                            ),
-                                        dcc.Input(
-                                            id="search-input",
-                                            type="text",
-                                            placeholder = "Type to search..."
-                                        ),
-                                        html.P(children = "Graph Color Filters:",
+                                        html.P(children = "Filtering within the network:",
                                                 style={
                                                     "marginLeft": "3px",
                                                     "fontWeight": "bold",
                                                     "fontFamily": "alegreya sans, sans-serif"
                                                     }
                                                 ),
-                                        html.P("Node filter for persons:" , style = {"fontFamily": "alegreya sans, sans-serif"}),
+                                        html.P("Filter within the network. Search for a specific person or grant, visualize attributes associated with grants or people or only show part of the network by filtering based on certain attributes. Below you can find the information of selected people and/or grants.",
+                                            style={
+                                                "fontFamily": "alegreya sans, sans-serif",
+                                                "color": "grey",
+                                                "fontSize": "14px",
+                                                "maxWidth": "650px"
+                                            }
+                                        ),                                        html.P(children = "Search person or grant:",
+                                            style = {
+                                                "marginLeft": "3px",
+                                                "fontFamily": "alegreya sans, sans-serif",
+                                                "fontWeight": "bold"
+                                                }
+                                            ),
+                                        html.Br(),
+                                        dcc.Input(
+                                            id="search-input",
+                                            type="text",
+                                            placeholder = "Type to search..."
+                                        ),
+                                        html.Br(),
+                                        html.P(children = "Visualize attributes:",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontWeight": "bold",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
+                                        html.P("Filter attributes of persons:" , style = {"fontFamily": "alegreya sans, sans-serif"}),
                                         dcc.Dropdown(
                                         id='color-dropdown',
                                         options=[
@@ -344,7 +375,7 @@ app.layout = html.Div(
                                         value=None, # Default color selection
                                         style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
-                                        html.P("Node filter for grants:", style = {"fontFamily": "alegreya sans, sans-serif"}),
+                                        html.P("Filter attributes of grants:", style = {"fontFamily": "alegreya sans, sans-serif"}),
                                         dcc.Dropdown(
                                         id='color-dropdown2',
                                         options=[
@@ -354,14 +385,15 @@ app.layout = html.Div(
                                         value=None ,  # Default color selection
                                         style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
-                                        html.P(children = "Graph Filters:",
+                                        html.Br(),
+                                        html.P(children = "Select based on attributes",
                                                 style={
                                                     "marginLeft": "3px",
                                                     "fontWeight": "bold",
                                                     "fontFamily": "alegreya sans, sans-serif"
                                                     }
                                                 ),
-                                        html.P(children = "Select Node Attribute:",
+                                        html.P(children = "Select attribute:",
                                                 style={
                                                     "marginLeft": "3px",
                                                     "fontFamily": "alegreya sans, sans-serif"
@@ -383,7 +415,7 @@ app.layout = html.Div(
                                                             value = None,
                                                             style = {"fontFamily": "alegreya sans, sans-serif"}
                                                     ),
-                                        html.P(children = "Select Attribute value:",
+                                        html.P(children = "Select attribute value:",
                                                 style={
                                                     "marginLeft": "3px",
                                                     "fontFamily": "alegreya sans, sans-serif"
@@ -396,7 +428,8 @@ app.layout = html.Div(
                                                             'margin-top': '20px',
                                                             "fontFamily": "alegreya sans, sans-serif"
                                                         }),
-                                        html.P("Information of Selected Nodes:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
+                                        html.Br(),
+                                        html.P("Information of Selected Nodes:", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"} ),
                                             html.Pre(
                                                 id="selected-node-data-json-output-filter",
                                                 style=styles["json-output"],
@@ -414,6 +447,21 @@ app.layout = html.Div(
                                 children=[
                                     html.Button("Remove Selected Node", id="remove-button", style = style_buttons,),
                                     html.Button("Reset", id = "bt-reset1", style = style_buttons),
+                                    html.P(children = "Removing people or grants",
+                                                style={
+                                                    "marginLeft": "3px",
+                                                    "fontWeight": "bold",
+                                                    "fontFamily": "alegreya sans, sans-serif"
+                                                    }
+                                                ),
+                                    html.P("Select people or grants and remove them from the network. This helps you visualize what would happen to the network if specific players were to dissapear.",
+                                        style={
+                                            "fontFamily": "alegreya sans, sans-serif",
+                                            "color": "grey",
+                                            "fontSize": "14px",
+                                            "maxWidth": "650px"
+                                        }
+                                    ),
                                     html.Div(
                                         style=styles["tab"],
                                         children=[
@@ -434,15 +482,27 @@ app.layout = html.Div(
             className = "graph",
             style={
                 'display': 'flex',
+                'position': 'relative',
                 'flexDirection': 'row',
                 'alignItems': 'flex-start',
                 'width': '100%',
+                # "border": "2px solid",
+                # "border-color": "#9EA9B3",
+                # "border-radius": "10px",
+                "margin-left": "20px",
+                "margin-right": "0px",
+                "margin-bottom": "10px",
             },
             children = [
                 html.Div(style={
                         'position': 'absolute',
-                        'top' : 0,
-                        'right' : 0
+                        'top' : '10px',
+                        'right' : '10px',
+                        "margin": "0px",
+                        "padding-left": "15px",
+                        "border": "2px solid",
+                        "border-color": "#9EA9B3",
+                        "border-radius": "10px",
                     },
                          children=[
                     html.P("Legend:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
