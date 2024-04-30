@@ -5,7 +5,7 @@ import dash_cytoscape as cyto
 from dash import callback_context
 cyto.load_extra_layouts()
 import json
-from feature_table import feature_table
+from f_feature_table import feature_table
 from dash.exceptions import PreventUpdate
 from f_load_data import load_data
 from f_colors import check_data_types,get_colors,get_colors2
@@ -57,14 +57,14 @@ for index, edge in edge_data.iterrows():
                 node_data['type'] = "person"
                 node_data['size'] = str(15+25*size_node) +'px'
                 node_data['color'] ='FF0000'
-                
+
             if node_id in to_att_df.index:
                 size_node=to_att_df[to_att_df['Node']==node_id].reset_index(drop=True).loc[0,'Node_Size']
                 node_attributes = to_att_df.loc[node_id].dropna().to_dict()
                 node_data.update(node_attributes)
                 node_data['type'] = "grant"
                 node_data['size'] = str(15+25*size_node) +'px'
-                node_data['color'] ='#0000FF'     
+                node_data['color'] ='#0000FF'
 
             cyto_nodes.append({'data': node_data})
 
@@ -86,7 +86,7 @@ for item in cyto_nodes:
         filtered_data.append(item['data'])
     else:
         filtered_data2.append(item['data'])
-        
+
 # Create a DataFrame from the filtered data
 to_df = pd.DataFrame(filtered_data)
 from_df=pd.DataFrame(filtered_data2)
@@ -108,7 +108,7 @@ default_stylesheet = [
             }
         },
     {
-        "selector": f'node[type = "grant"]', 
+        "selector": f'node[type = "grant"]',
         "style": {
             "opacity": 0.55,
             'width': 'data(size)',
@@ -120,7 +120,7 @@ default_stylesheet = [
     {
         "selector": "edge",
         "style": {
-            "curve-style": "bezier", 
+            "curve-style": "bezier",
             'opacity': 0.2,
             'width': "2",
         }
@@ -216,11 +216,11 @@ app.layout = html.Div(
                                                 ],
                                             value = "cose-bilkent",
                                             clearable = False,
-                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                            style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
                                     ],
                                 ),
-                                html.Div( 
+                                html.Div(
                                     children = [
                                         html.P("Node shape for persons:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                         dcc.Dropdown(
@@ -237,9 +237,9 @@ app.layout = html.Div(
                                                 {'label': 'Star', 'value': 'star'},
                                                 {'label': 'Triangle', 'value': 'triangle'}
                                             ],
-                                            value="ellipse", 
+                                            value="ellipse",
                                             clearable = False,
-                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                            style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
                                         html.P("Node shape for grants:", style = {"fontFamily": "alegreya sans, sans-serif"}),
                                         dcc.Dropdown(
@@ -257,18 +257,18 @@ app.layout = html.Div(
                                                 {'label': 'Triangle', 'value': 'triangle'}
                                             ],
                                             value="diamond",
-                                            clearable = False, 
-                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                            clearable = False,
+                                            style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
                                         html.Div([
-                                        dcc.Store(id='shape-store', 
+                                        dcc.Store(id='shape-store',
                                                   data={'person_shape': 'ellipse', 'grant_shape': 'diamond'})])
                                         ],
                                 ),
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of persons:", 
+                                        html.P(children = "Color of persons:",
                                             style ={
                                                 "marginLeft": "3px",
                                                 "fontFamily": "alegreya sans, sans-serif"
@@ -288,7 +288,7 @@ app.layout = html.Div(
                                 html.Div(
                                     style = {"margin": "10px 0px"},
                                     children = [
-                                        html.P(children = "Color of grants:", 
+                                        html.P(children = "Color of grants:",
                                             style = {
                                                 "marginLeft": "3px",
                                                 "fontFamily": "alegreya sans, sans-serif"
@@ -316,7 +316,7 @@ app.layout = html.Div(
                                     children=[
                                         html.Button("Reset", id = "bt-reset", style = style_buttons,),
                                         html.Button("Deselect Node", id="bt-undo1", style = style_buttons),
-                                        html.P(children = "Search for person or grant:", 
+                                        html.P(children = "Search for person or grant:",
                                             style = {
                                                 "marginLeft": "3px",
                                                 "fontFamily": "alegreya sans, sans-serif"
@@ -342,7 +342,7 @@ app.layout = html.Div(
                                                                     'label': key,
                                                                     'value': key} for key,value in data_types.items()],
                                         value=None, # Default color selection
-                                        style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                        style = {"fontFamily": "alegreya sans, sans-serif"}
                                         ),
                                         html.P("Node filter for grants:", style = {"fontFamily": "alegreya sans, sans-serif"}),
                                         dcc.Dropdown(
@@ -369,7 +369,7 @@ app.layout = html.Div(
                                                 ),
                                         dcc.Store(id = "filter-history-store"),
                                         html.Div(
-                                            style = 
+                                            style =
                                             styles['tab'],
                                             children= [
                                                 html.Div([
@@ -379,9 +379,9 @@ app.layout = html.Div(
                                                                 {
                                                                     'label': attr,
                                                                     'value': attr} for attr in node_attributes],
-                                                                    
+
                                                             value = None,
-                                                            style = {"fontFamily": "alegreya sans, sans-serif"} 
+                                                            style = {"fontFamily": "alegreya sans, sans-serif"}
                                                     ),
                                         html.P(children = "Select Attribute value:",
                                                 style={
@@ -405,7 +405,7 @@ app.layout = html.Div(
                                         )
                                         ]
                                     ),
-                                
+
                                 ]
                             ),
                             dcc.Tab(
@@ -434,9 +434,9 @@ app.layout = html.Div(
             className = "graph",
             style={
                 'display': 'flex',
-                'flexDirection': 'row',  
-                'alignItems': 'flex-start',  
-                'width': '100%',            
+                'flexDirection': 'row',
+                'alignItems': 'flex-start',
+                'width': '100%',
             },
             children = [
                 html.Div(style={
@@ -447,7 +447,7 @@ app.layout = html.Div(
                          children=[
                     html.P("Legend:", style = {"fontFamily": "alegreya sans, sans-serif"} ),
                     html.Legend(id='legend', style={'order': 1, 'marginRight' : ' 5px'}),
-                    html.Legend(id='legend2',  style={'order': 2, 'marginRight' : ' 5px'}),   
+                    html.Legend(id='legend2',  style={'order': 2, 'marginRight' : ' 5px'}),
                 ]),
                 cyto.Cytoscape(
                     id = "cytoscape",
@@ -460,7 +460,7 @@ app.layout = html.Div(
                     layout = {
                         "name": "cose-bilkent",
                         },
-                    boxSelectionEnabled=True, 
+                    boxSelectionEnabled=True,
                     userPanningEnabled=True
                 )
             ],
@@ -492,7 +492,7 @@ def get_triggered_id():
         Input('color-dropdown', 'value'),
         Input('color-dropdown2', 'value'),
         State("cytoscape", "selectedNodeData")
-    ],   
+    ],
 )
 def generate_stylesheet(person_shape, grant_shape, source_color, target_color, search_value, node, color_dropdown, color_dropdown2, selected_nodes):
     triggered_id = get_triggered_id()
@@ -517,16 +517,16 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             # Generate legend based on unique colors in 'first_df'
             unique_colors = first_df[[color_dropdown, 'color']].drop_duplicates().sort_values(by=color_dropdown)
             legend_items = [
                 html.Li(f"{color_dropdown}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors.itertuples(index=False)]
             legend = html.Ul(legend_items)
-        
+
         if color_dropdown2:
-            
+
             drop_down_type2 = data_types2.get(color_dropdown2)
             second_df=get_colors2(to_df,color_dropdown2,drop_down_type2)
             new_stylesheet += [
@@ -542,14 +542,14 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             # Generate legend based on unique colors in 'second_df'
             unique_colors2 = second_df[[color_dropdown2, 'color']].drop_duplicates().sort_values(by=color_dropdown2)
             legend_items2 = [
                 html.Li(f"{color_dropdown2}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors2.itertuples(index=False)]
             legend2 = html.Ul(legend_items2)
-        
+
         new_stylesheet += [
             {
                     "selector": "edge",
@@ -557,9 +557,9 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "opacity": 0.2,
                         "curve-style": "bezier",
                     }}]
-        
+
         return new_stylesheet, legend, legend2
-    
+
     if triggered_id == "search-input":
         if search_value == None and selected_nodes == []:
             stylesheet = [
@@ -635,10 +635,10 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                     ]
                 legend = html.Ul(legend_items)
-                return stylesheet, legend, []                
+                return stylesheet, legend, []
             stylesheet = [
                 {
-                    "selector": 'node[type = "person"]', 
+                    "selector": 'node[type = "person"]',
                     "style": {
                         "opacity": 0.55,'width': 'data(size)',
                         'height': 'data(size)',
@@ -646,7 +646,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         }
                 },
                 {
-                    "selector": 'node[type = "grant"]', 
+                    "selector": 'node[type = "grant"]',
                     "style": {
                         "opacity": 0.55,'width': 'data(size)',
                         'height': 'data(size)',
@@ -673,7 +673,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "text-opacity": 1,
                         "font-size": 12,
                         "z-index": 9999,
-                        
+
                         "text-opacity": 0.8,
                     "font-size": 12,
                     },
@@ -686,8 +686,8 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         {
                             "selector": f'node[id = "{edge["target"]}"]',
                             "style": {
-                                "background-color": target_color, 
-                                
+                                "background-color": target_color,
+
                                  "opacity": 0.9,
                                   "z-index": 9999},
                         }
@@ -709,7 +709,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'node[id = "{edge["source"]}"]',
                             "style": {
                                 "background-color": source_color,
-                                
+
                                 "opacity": 0.9,
                                 "z-index": 9999,
                             },
@@ -750,11 +750,11 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
             {
                 "selector": 'edge',
                 "style": {
-                    "opacity": 0.9, 
+                    "opacity": 0.9,
                 }
             },
             {
-                "selector": f'node[id *= "{search_value}"]', 
+                "selector": f'node[id *= "{search_value}"]',
                 "style": {
                     "background-color": "#B10DC9",
                     "border-color": "purple",
@@ -867,10 +867,10 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 ]
             legend = html.Ul(legend_items)
             return stylesheet, legend, []
-    
+
         stylesheet = [
             {
-                "selector": 'node[type = "person"]', 
+                "selector": 'node[type = "person"]',
                 "style": {
                    "opacity": 0.55,'width': 'data(size)',
                     'height': 'data(size)',
@@ -878,7 +878,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     }
             },
             {
-                "selector": 'node[type = "grant"]', 
+                "selector": 'node[type = "grant"]',
                 "style": {
                     "opacity": 0.55,'width': 'data(size)',
                     'height': 'data(size)',
@@ -976,7 +976,7 @@ def update_input_color(input_value):
 @callback(Output("cytoscape", "layout"), Input("dropdown-layout", "value"))
 def update_cytoscape_layout(layout):
     return {"name": layout}
-    
+
 @callback(
     Output("cytoscape", "elements", allow_duplicate=True),
     Input("remove-button", "n_clicks"),
@@ -1006,7 +1006,7 @@ def remove_selected_nodes(_, elements, data):
     Input("dropdown-node-shape-grant", "value"),
     Input("input-source-color", "value"),
     Input("input-target-color", "value"),
-    Input("bt-reset", "n_clicks"), 
+    Input("bt-reset", "n_clicks"),
     Input("bt-reset1", "n_clicks")],
     prevent_initial_call = True
 )
@@ -1054,14 +1054,14 @@ def reset_layout(person_shape, grant_shape, source_color, target_color, n_clicks
 def displaySelectedNodeData(data):
     if data and data!=None:
         for i in range(len(data)):
-            
+
             table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
-                tables=[table1,]                                                                
+                tables=[table1,]
             else:
                 tables.extend([table1,])
         return tables
-    raise PreventUpdate                                                                                                 
+    raise PreventUpdate
 
 @callback(
     Output("selected-node-data-json-output-filter", "children", allow_duplicate=True),
@@ -1071,14 +1071,14 @@ def displaySelectedNodeData(data):
 def displaySelectedNodeData(data):
     if data and data!=None:
         for i in range(len(data)):
-            
+
             table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
-                tables=[table1,]                                                                
+                tables=[table1,]
             else:
                 tables.extend([table1,])
         return tables
-    raise PreventUpdate 
+    raise PreventUpdate
 
 
 @app.callback(
@@ -1140,12 +1140,12 @@ def update_store(person_shape, grant_shape, data):
 def update_attribute_values(selected_attribute, elements):
     if not selected_attribute:
         return []  # Return an empty list of options if no attribute is selected
-   
+
     unique_values = set()
     for element in elements:
         if 'source' not in element['data'] and selected_attribute in element['data']:
             unique_values.add(element['data'][selected_attribute])
-   
+
     return [{'label': value, 'value': value} for value in unique_values]
 
 @app.callback(
@@ -1181,7 +1181,7 @@ def filter_nodes_by_attribute(selected_value, selected_attribute, elements, filt
         if 'source' in el['data']:
             if el['data']['source'] in matching_nodes or el['data']['target'] in matching_nodes:
                 connected_nodes.update([el['data']['source'], el['data']['target']])
-   
+
     filtered_elements = [
         el for el in elements
         if 'source' not in el['data'] and el['data']['id'] in connected_nodes
@@ -1210,14 +1210,14 @@ def filter_nodes_by_attribute(selected_value, selected_attribute, elements, filt
         Input("bt-undo", "n_clicks"),
         Input("bt-undo1", "n_clicks"),
         Input("color-dropdown2", "value"),
-        Input("color-dropdown", "value"),    
+        Input("color-dropdown", "value"),
     ], prevent_initial_call=True)
 def reset_stylesheet_on_tap(nclicks, n_clicks1, color2, color1):
     if (nclicks or n_clicks1):
         return  None, None, None, None, color2, color1
     else:
         return  no_update, no_update, no_update, no_update, no_update, no_update
-        
+
 
 @app.callback(
     [
@@ -1276,5 +1276,4 @@ def reset_dropdowns(person_shape, grant_shape, source_color, target_color, dropd
         return no_update, no_update, no_update
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5003)
-
+    app.run(debug=False, port=5003)

@@ -3,7 +3,7 @@ import pandas as pd
 import dash
 from dash import Input, Output, State, dcc, html
 import dash_cytoscape as cyto
-from  dash_components  import NamedDropdown, DropdownOptionsList,NamedRadioItems
+from  f_dash_components  import NamedDropdown, DropdownOptionsList,NamedRadioItems
 
 # Load extra layouts for Cytoscape
 cyto.load_extra_layouts()
@@ -30,7 +30,7 @@ nodes = set()
 
 ########################### Deze Code is voor nu niet nodig #######################################
 # # Data looks like this
-# # From          To 
+# # From          To
 # # People        Grant
 # # Source        Target
 
@@ -44,7 +44,7 @@ for index, edge in edges.iterrows():
         nodes.add(source)
         cyto_nodes.append({
             "data": {
-                "id": str(source), 
+                "id": str(source),
                 "label": str(source)
             }
         })
@@ -52,18 +52,18 @@ for index, edge in edges.iterrows():
         nodes.add(target)
         cyto_nodes.append({
             "data": {
-                "id": str(target), 
+                "id": str(target),
                 "label": str(target)
             }
         })
-        
+
     cyto_edges.append({
         "data": {
-            "source": str(source), 
+            "source": str(source),
             "target": str(target)
             }
         })
-    
+
 ########################### Stylesheet ##########################################################
 
 # Define the cytoscape stylesheet
@@ -104,7 +104,7 @@ def populate_relationships(edges: list):
         if source not in following_node_di:
             following_node_di[source] = []
             following_edges_di[source] = []
-        
+
         following_edges_di[source].append({
             "data": {
                 "id": str(source + target),
@@ -143,12 +143,12 @@ def get_node_with_highest_degree(edges_dict: dict):
         degrees[source] = len(edges)
     # Find the node with the highest degree
     max_degree_node = max(degrees, key=degrees.get)
-    
+
     # Retrieve the target node of the highest degree node
     edges_of_max_node = edges_dict[max_degree_node]
     first_edge = edges_of_max_node[0]  # Assuming at least one edge exists
     max_node_target = first_edge["data"]["target"]
-    
+
     # Construct the node data with the desired layout
     node_with_highest_degree = {
         "data": {
@@ -156,7 +156,7 @@ def get_node_with_highest_degree(edges_dict: dict):
             "label": str(max_node_target)
         }
     }
-    
+
     return node_with_highest_degree
 
 ######################################## Initiate functions ####################################################
@@ -199,7 +199,7 @@ control_panel = dcc.Tab(
             value="People",
         ),
         html.P(
-            children = "Search for person or grant:", 
+            children = "Search for person or grant:",
             style = {
                 "marginLeft": "3px"
                 }
@@ -244,7 +244,7 @@ cytoscape_panel = html.Div(
                 "height": "95vh"
             },
             id="cytoscape",
-            elements=default_elements,  
+            elements=default_elements,
             stylesheet=[
                 # Default stylesheet
                 {
@@ -254,9 +254,9 @@ cytoscape_panel = html.Div(
                     }
                 },
                 {
-                    "selector": "edge", 
+                    "selector": "edge",
                     "style": {
-                        "curve-style": "bezier", 
+                        "curve-style": "bezier",
                         "opacity": 0.65
                     }
                 },
@@ -294,7 +294,7 @@ app.layout = html.Div(
     },
 )
 
-                
+
 
 # Define callbacks for interactive features (node/edge taps, layout changes, etc.)
 # Include callbacks for updating the layout, displaying JSON data, and expanding nodes
@@ -308,16 +308,16 @@ app.layout = html.Div(
 )
 def generate_elements(nodeData: dict, elements: dict, expansion_mode):
     """
-    No Node has no data, return the elements unchanged. 
+    No Node has no data, return the elements unchanged.
     :param dict nodeData: nodedata contains: (expanded: bool), (class: string) and (data: dict) with (id: string), (label: string)
     :param dict elements: all elements returned from cytoscape.
     """
     if not nodeData:
         return elements
-    
+
     # Node has already been expanded; no further action is necessary.
     if nodeData.get("expanded"):
-        return elements 
+        return elements
 
     # Mark the node as expanded to prevent re-expansion.
     for element in elements:
@@ -327,14 +327,14 @@ def generate_elements(nodeData: dict, elements: dict, expansion_mode):
 
     # Expand nodes based on the expansion mode (followers or following).
     if expansion_mode == "People":
-        # Add follower nodes and edges. 
+        # Add follower nodes and edges.
         followers_nodes = followers_node_di.get(int(nodeData["data"]["id"]))
         followers_edges = followers_edges_di.get(int(nodeData["data"]["id"]))
         if followers_nodes:
             for node in followers_nodes:
                 node["classes"] = "followerNode"
             elements.extend(followers_nodes)
-        
+
             if followers_edges:
                 for follower_edge in followers_edges:
                     follower_edge["classes"] = "followerEdge"
@@ -358,7 +358,7 @@ def generate_elements(nodeData: dict, elements: dict, expansion_mode):
     return elements
 
 @app.callback(
-    Output("cytoscape", "elements",allow_duplicate=True), 
+    Output("cytoscape", "elements",allow_duplicate=True),
     Input("search-input", "value"),
     prevent_initial_call=True
 )
@@ -373,7 +373,7 @@ def update_graph(search_value):
             filtered_data_edges.append(edge)
             filtered_data_nodes.update([edge['data']['source'], edge['data']['target']])
     new_cyto_nodes = [node for node in cyto_nodes if node['data']['id'] in filtered_data_nodes]
-  
+
     return filtered_data_edges + new_cyto_nodes
 
 @app.callback(
@@ -396,4 +396,3 @@ def display_tap_edge(data):
 
 if __name__ == "__main__":
     app.run_server(debug=True,port = 5002)
-
