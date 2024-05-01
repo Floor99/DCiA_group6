@@ -192,14 +192,14 @@ control_panel = dcc.Tab(
                 # "concentric",
                 # "breadthfirst",
                 # "cose",
-                "Default (cose-bilkent)",
+                "cose-bilkent",
                 # "dagre",
                 # "cola",
                 # "klay",
                 # "spread",
                 # "euler",
             ),
-            value="Default (cose-bilkent)",
+            value="cose-bilkent",
             clearable=False,
         ),
         NamedRadioItems(
@@ -213,7 +213,7 @@ control_panel = dcc.Tab(
     ],
 )
 json_panel = dcc.Tab(
-    label="JSON",
+    label="Node information",
     children=[
         html.Div(
             #style=styles["tab"],
@@ -282,7 +282,8 @@ app.layout = html.Div(
                 ),
             ],
             style= {
-                "minWidth" : "25%"
+                "minWidth" : "25%",
+                "margin": "15px",
             }
         ),
         cytoscape_panel
@@ -290,7 +291,6 @@ app.layout = html.Div(
     style=
     {
         "display": "flex",
-        "padding": "15px",
         "flexDirection": "row",
         "width": "100%"
     },
@@ -397,4 +397,4 @@ def display_tap_edge(data):
     return json.dumps(data, indent=2) if data else ""
 
 if __name__ == "__main__":
-    app.run_server(debug=False, port = 5002)
+    app.run_server(debug=True,port = 5002)
