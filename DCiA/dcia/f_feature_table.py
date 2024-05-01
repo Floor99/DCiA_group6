@@ -4,7 +4,6 @@ import dash_cytoscape as cyto
 import json
 
 def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator):
-    
         ID=int(data[iterator]["id"])
         if ID in from_att_df['Node'].values:
             row_value = from_att_df[from_att_df['Node'] == ID].iloc[0]
