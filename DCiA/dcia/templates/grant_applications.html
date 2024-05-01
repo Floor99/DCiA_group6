@@ -6,7 +6,7 @@
     <p>This network shows the articles and authors in your organization. Blue nodes represent people and grey nodes represent a paper/publication. The blue edges connect two authors if they have worked together on a publication, the grey lines connect the authors to the publications they have worked on. The thicker the line between two authors the more publications they have worked on together.</p>
     <div class="row my-4">
         <div class="col-md-12">
-            <iframe src="http://127.0.0.1:5003" width="100%" height="600" style="border: 2px solid #9EA9B3; border-radius: 10px;"></iframe></iframe>
+            <iframe src="http://127.0.0.1:5003" width="100%" height="800" style="border: 2px solid #9EA9B3; border-radius: 10px;"></iframe></iframe>
             <div class="text-end">
                 <button class="btn btn-outline-secondary mt-2">Export figure</button>
             </div>
@@ -36,9 +36,11 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Network statistics (to be changed)</h5>
-                    <p class="card-text">Community detection: Some information about community detection in the given network.</p>
-                    <a href="#" class="btn btn-secondary">Show top 5 communities</a>
+                    <h5 class="card-title">Explore Individuals - Node Expansion </h5>
+                    <p class="card-text">Try out our node expansion network, where you select a person that you're interested in and then see who that person is connected to. In turn, you can see who are connected to those connected persons. This can help you zoom in on a specific person and their connectivity to others without being overwhelmed with the whole network.</p>
+                    <p>Visulization through node expansion can be useful for interventions as they allow you to more closely analyze a large network. You can look at specific individuals whom you might like to target in your intervention and you can closely observe who are key players and who are form bottlenecks in the network. </p>
+                    <p>Step by step analysis of a network also increased the intutive understanding of the network, even if you have never worked with a network visulisation before. Click the button below to go to the node expansion network, search for a node and click on it to expand it. You will see more and more people entering your sub-network. </p>
+                    <a href="{{ url_for('grant_applications_expansion') }}" class="btn btn-secondary">Explore individuals</a>
                 </div>
             </div>
         </div>
@@ -46,8 +48,15 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Community detection</h5>
-                    <p class="card-text">Will produce new files with an attribute added for community that can be reuploaded above. </p>
-                    <a href="#" class="btn btn-secondary">Show most important bridgers</a>
+                    <p class="card-text">Would you like us to detect communities in your network? With our community detection algorithms we can detect communities of people who are well connected to each other. It's useful to visualize communities because then you can target individuals from different communities and encourage collaboration so that knoweldge is spread across different communities.</p>
+                    <p> Below you can indicate how many communities you would like to be detected. If you choose a high number, there will be many small communities, if you choose a low number, there will be a few larger communities. Once you've selected the number of communities we will determine the communities for your and give you back a data file with a new column called 'community_number'. This columns is treated as an attribute in the above visualisation tool. Thus to look at the different communities, upload your new file above and go to the filter tab. Detect away! </p>
+                    <form action="#" method="post"> <!-- Change action to the URL where data should be sent -->
+                        <label for="numberInput">Number:</label>
+                        <input type="number" id="numberInput" name="number" required>
+                        <button type="submit">Submit</button>
+                    </form>
+                    <br>
+                    <a href="#" class="btn btn-secondary">Detect communities</a>
                 </div>
             </div>
         </div>
