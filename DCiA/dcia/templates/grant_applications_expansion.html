@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center my-4">Grant Applications - <b>Network Expansion</b></h1>
+    <p>Here you can play around with the network expansion tool. Search for a person that you would like to analyse. Click this person to see who is connected to your person. Click on the connected people to see who is connected to them. This allows you to analyze a person in a network step by step.</p>
+    <div class="row my-4">
+        <div class="col-md-12">
+            <iframe src="http://127.0.0.1:5002" width="100%" height="800" style="border: 2px solid #9EA9B3; border-radius: 10px;"></iframe>
+        </div>
+    </div>
+    <!-- Button to go back to the whole network -->
+    <div class="row">
+        <div class="col-md-12 text-center my-4">
+            <a href="{{ url_for('grant_applications') }}" class="btn btn-secondary">Back to Full Network</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
