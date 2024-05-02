@@ -173,7 +173,7 @@ control_panel = dcc.Tab(
     ],
 )
 json_panel = dcc.Tab(
-    label="Information",
+    label="Node Information",
     children=[
         html.Div(
             #style=styles["tab"],
@@ -238,7 +238,8 @@ app.layout = html.Div(
                 ),
             ],
             style= {
-                "minWidth" : "25%"
+                "minWidth" : "25%",
+                "margin": "15px",
             }
         ),
         cytoscape_panel
@@ -345,4 +346,4 @@ def update_layout(layout_value):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True,port = 5002)
+    app.run_server(debug=False ,port = 5002)
