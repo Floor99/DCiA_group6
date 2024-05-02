@@ -3,6 +3,7 @@ from dash import Input, Output, callback, Dash, html, dcc, State
 import dash_cytoscape as cyto
 import json
 
+
 def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
         ID=int(data[iterator]["id"])
         if ID in from_att_df['Node'].values:
