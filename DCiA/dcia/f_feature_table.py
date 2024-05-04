@@ -1,74 +1,65 @@
 import pandas as pd
-from dash import Input, Output, callback, Dash, html, dcc, State
-import dash_cytoscape as cyto
-import json
+from dash import html
+from typing import Dict, Any
 
-
-def feature_table(data,from_att_df,to_att_df,grant_to_people_df,iterator ):
-        ID=int(data[iterator]["id"])
-        if ID in from_att_df['Node'].values:
-            row_value = from_att_df[from_att_df['Node'] == ID].iloc[0]
-            df = pd.DataFrame(columns=['Selected Node', str(ID)])
-            for column_name, value in list(row_value.items())[2:]:
-                if column_name !='Node_Size':
-                    column_name = truncate_with_dots(column_name)
-                    df.loc[len(df)] = [column_name, value]
-            filtered_df = grant_to_people_df[grant_to_people_df.eq(ID).any(axis=1)].iloc[:, 1]
-            if len(filtered_df) % 2 != 0:
-                filtered_df=pd.concat([filtered_df, pd.Series([' '])])
-            num_rows = (len(filtered_df) + 1) // 2
-            reshaped_df = pd.DataFrame(filtered_df.values.reshape(num_rows, 2))    
-            
-        elif ID in to_att_df['Node'].values:
-            row_value = to_att_df[to_att_df['Node'] == ID].iloc[0]
-            df = pd.DataFrame(columns=['Selected Node', str(ID)])
-            for column_name, value in list(row_value.items())[2:]:
-                if column_name !='Node_Size':
-                    column_name = truncate_with_dots(column_name)
-                    df.loc[len(df)] = [column_name, value]
-            filtered_df = grant_to_people_df[grant_to_people_df.eq(ID).any(axis=1)].iloc[:, 0]
-            if len(filtered_df) % 2 != 0:
-                filtered_df=pd.concat([filtered_df, pd.Series([' '])])
-            num_rows = (len(filtered_df) + 1) // 2
-            reshaped_df = pd.DataFrame(filtered_df.values.reshape(num_rows, 2))
-    
-        reshaped_df.columns = ['Connected Nodes','']  
-        return html.Div([html.Table(
-            # Header
-            [html.Tr([html.Th(col) for col in df.columns])] +
-            # Body
-            [html.Tr([html.Td(row[col]) for col in df.columns]) for idx, row in df.iterrows()],
-            style={
-                'borderCollapse': 'collapse',
-                'border': '1px solid black',
-                'fontFamily': "alegreya sans, sans-serif",
-                'fontSize': '16px',
-                'textAlign': 'center',
-                'marginRight': '10px',
-            'width': '100%',
+stylesheet= {
+            'fontFamily': "alegreya sans, sans-serif",
+            'fontSize': '16px',
+            'textAlign': 'center',
+            'width' : '100%',
             'table-layout': 'fixed',
-            'justify-content': 'space-between'}
-        ),html.Table(
-            # Header
-            [html.Tr([html.Th(col) for col in reshaped_df.columns])] +
-            # Body
-            [html.Tr([html.Td(row[col]) for col in reshaped_df.columns]) for idx, row in reshaped_df.iterrows()],
-            style={
-                'borderCollapse': 'collapse',
-                'border': '1px solid black',
-                'fontFamily': "alegreya sans, sans-serif",
-                'fontSize': '16px',
-                'textAlign': 'center',
-                'marginRight': '10px'
-            , 'marginBottom': '10px', 
-            'background-color': '#dfe0e1',  
-            'width': '100%',
-            'table-layout': 'fixed',
-            'justify-content': 'space-between'}
-        )])
+        }
+td_stylesheet= {
+            'width' : '50%'
+        }
+def current_node_attributes_table(cytoscape_nodes : Dict[str, Any], source_att_df : pd.DataFrame, target_att_df : pd.DataFrame, adjency_list_df : pd.DataFrame, node_index: int ):
+        NODE_ID = int(cytoscape_nodes[node_index]["id"])
+        node_is_in_source_df = NODE_ID in source_att_df['Node'].values
         
-def truncate_with_dots(string):
-    if len(str(string)) > 20:
-        return string[:18] + ".."
-    else:
-        return string
+        node_df = source_att_df if node_is_in_source_df else target_att_df
+
+        node_attributes = node_df[node_df['Node'] == NODE_ID].iloc[0].drop(["index","Node","Node_Size"]).to_dict()
+
+        # Prepend "Current Node : ID" to the attributes list.
+        node_attributes = { 'Current Node': 100, **node_attributes }
+        
+        # Truncate the keys with an elipsis when it is too long
+        node_attributes = {truncate_string(key, 19): value for key, value in node_attributes.items()}
+
+        # Find the adjacent nodes in the given dataframe of structure: From to
+        adjacent_nodes_df = adjency_list_df.loc[adjency_list_df['from'] == NODE_ID]['to']
+
+        return html.Div([
+            html.Table(
+                # Header
+                [
+                    html.Tr([
+                                html.Th("Attribute", style= td_stylesheet), html.Th("Value", style= td_stylesheet)
+                            ], style= td_stylesheet)
+                ] +
+                [
+                    html.Tr([
+                                html.Td(key, style= td_stylesheet), html.Td(value, style= td_stylesheet)
+                            ], style= td_stylesheet) for key, value in node_attributes.items()
+                ],
+                style=stylesheet
+            ),
+            html.Hr(),
+            html.Table(
+                # Header
+                [
+                    html.Tr([
+                                html.Th('Connected Nodes'), html.Th('')
+                            ], style= td_stylesheet)
+                ] +
+                # Body
+                [
+                        html.Tr(
+                                    html.Td(val),
+                                    style= td_stylesheet) for val in adjacent_nodes_df.values
+                ],
+                style=stylesheet
+            )
+        ], style= {"width" : "100%"})
+def truncate_string(string: str, limit: int):
+    return string[:limit] + '…' if len(string) > limit else string
