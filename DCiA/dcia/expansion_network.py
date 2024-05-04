@@ -154,9 +154,10 @@ control_panel = dcc.Tab(
                 # {'label': 'Concentric', 'value': 'concentric'},
                 {'label': 'Default (Cose-bilkent)', 'value': 'cose-bilkent'},
                 {'label': 'Grid', 'value': 'grid'},
-                {'label': 'Random', 'value': 'random'}
+                {'label': 'Random', 'value': 'random'},
+                {'label': 'cola','value': 'cola'}
                 ],
-            value = "cola",
+            value = "cose-bilkent",
             clearable = False,
             style = {"fontFamily": "alegreya sans, sans-serif"}
         ),
