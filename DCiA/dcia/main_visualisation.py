@@ -4,12 +4,10 @@ from dash import Input, Output, callback, Dash, html, dcc, State,callback_contex
 import dash_cytoscape as cyto
 from dash import callback_context
 cyto.load_extra_layouts()
-import json
-from f_feature_table import feature_table
+from f_feature_table import current_node_attributes_table
 from dash.exceptions import PreventUpdate
 from f_load_data import load_data
 from f_colors import check_data_types,get_colors,get_colors2
-import random
 
 # Run this app to run only the website
 app = Dash(__name__)
@@ -128,10 +126,7 @@ default_stylesheet = [
 ]
 styles = {
     "json-output": {
-        "overflow-y": "scroll",
-        "overflow-x": "scroll",
         "height": "calc(90% - 25px)",
-        "width": "350px",
         "border": "thin lightgrey solid",
     },
     "tab": {"height": "calc(98vh - 115px)"},
@@ -192,6 +187,7 @@ app.layout = html.Div(
         dcc.Store(id='current-stylesheet', data=default_stylesheet),
         html.Div(
                className = "settings",
+               style = {"width" : "calc(100vw/3)"},
                children = [
                    dcc.Tabs(
                     id="tabs",
@@ -1115,7 +1111,7 @@ def displaySelectedNodeData(data):
     if data and data!=None:
         for i in range(len(data)):
 
-            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+            table1= current_node_attributes_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
                 tables=[table1,]
             else:
@@ -1132,7 +1128,7 @@ def displaySelectedNodeData(data):
     if data and data!=None:
         for i in range(len(data)):
 
-            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+            table1= current_node_attributes_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
                 tables=[table1,]
             else:
