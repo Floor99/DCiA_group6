@@ -187,7 +187,7 @@ app.layout = html.Div(
         dcc.Store(id='current-stylesheet', data=default_stylesheet),
         html.Div(
                className = "settings",
-               style = {"width" : "calc(100vw/3)"},
+               style = {"width" : "calc(100vw/4)"},
                children = [
                    dcc.Tabs(
                     id="tabs",
@@ -219,9 +219,9 @@ app.layout = html.Div(
                                         dcc.Input(
                                             id="input-source-color",
                                             type="text",
-                                            value="#0074D9",
+                                            value="blue",
                                             style = {
-                                                "color": "#0074D9",
+                                                "color": "blue",
                                                 "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                         ),
@@ -239,9 +239,9 @@ app.layout = html.Div(
                                         dcc.Input(
                                             id="input-target-color",
                                             type="text",
-                                            value="#FF4136",
+                                            value="red",
                                             style = {
-                                                "color": "#FF4136",
+                                                "color": "red",
                                                 "fontFamily": "alegreya sans, sans-serif"
                                                 }
                                         ),
@@ -254,12 +254,12 @@ app.layout = html.Div(
                                             id="dropdown-node-shape-person",
                                             options=[
                                                 {'label': 'Diamond', 'value': 'diamond'},
-                                                {'label': 'Ellipse', 'value': 'ellipse'},
-                                                {'label': 'Heptagon', 'value': 'heptagon'},
-                                                {'label': 'Hexagon', 'value': 'hexagon'},
-                                                {'label': 'Octagon', 'value': 'octagon'},
-                                                {'label': 'Pentagon', 'value': 'pentagon'},
-                                                {'label': 'Polygon', 'value': 'polygon'},
+                                                {'label': 'Circle', 'value': 'ellipse'},
+                                                # {'label': 'Heptagon', 'value': 'heptagon'},
+                                                # {'label': 'Hexagon', 'value': 'hexagon'},
+                                                # {'label': 'Octagon', 'value': 'octagon'},
+                                                # {'label': 'Pentagon', 'value': 'pentagon'},
+                                                # {'label': 'Polygon', 'value': 'polygon'},
                                                 {'label': 'Rectangle', 'value': 'rectangle'},
                                                 {'label': 'Star', 'value': 'star'},
                                                 {'label': 'Triangle', 'value': 'triangle'}
@@ -273,12 +273,12 @@ app.layout = html.Div(
                                             id="dropdown-node-shape-grant",
                                             options=[
                                                 {'label': 'Diamond', 'value': 'diamond'},
-                                                {'label': 'Ellipse', 'value': 'ellipse'},
-                                                {'label': 'Heptagon', 'value': 'heptagon'},
-                                                {'label': 'Hexagon', 'value': 'hexagon'},
-                                                {'label': 'Octagon', 'value': 'octagon'},
-                                                {'label': 'Pentagon', 'value': 'pentagon'},
-                                                {'label': 'Polygon', 'value': 'polygon'},
+                                                {'label': 'Circle', 'value': 'ellipse'},
+                                                # {'label': 'Heptagon', 'value': 'heptagon'},
+                                                # {'label': 'Hexagon', 'value': 'hexagon'},
+                                                # {'label': 'Octagon', 'value': 'octagon'},
+                                                # {'label': 'Pentagon', 'value': 'pentagon'},
+                                                # {'label': 'Polygon', 'value': 'polygon'},
                                                 {'label': 'Rectangle', 'value': 'rectangle'},
                                                 {'label': 'Star', 'value': 'star'},
                                                 {'label': 'Triangle', 'value': 'triangle'}
@@ -340,19 +340,21 @@ app.layout = html.Div(
                                                 "fontSize": "14px",
                                                 "maxWidth": "650px"
                                             }
-                                        ),                                        html.P(children = "Search person or grant:",
+                                        ),
+
+                                        html.P(children = "Search person or grant:",
                                             style = {
                                                 "marginLeft": "3px",
                                                 "fontFamily": "alegreya sans, sans-serif",
                                                 "fontWeight": "bold"
                                                 }
                                             ),
-                                        html.Br(),
                                         dcc.Input(
                                             id="search-input",
                                             type="text",
                                             placeholder = "Type to search..."
                                         ),
+                                        html.Br(),
                                         html.Br(),
                                         html.P(children = "Visualize attributes:",
                                                 style={
@@ -1145,15 +1147,15 @@ def update_person_options(data):
     grant_shape = data['grant_shape']
     available_shapes = [
         {'label': 'Diamond', 'value': 'diamond'},
-        {'label': 'Ellipse', 'value': 'ellipse'},
-        {'label': 'Heptagon', 'value': 'heptagon'},
-        {'label': 'Hexagon', 'value': 'hexagon'},
-        {'label': 'Octagon', 'value': 'octagon'},
-        {'label': 'Pentagon', 'value': 'pentagon'},
-        {'label': 'Polygon', 'value': 'polygon'},
-        {'label': 'Rectangle', 'value': 'rectangle'},
-        {'label': 'Star', 'value': 'star'},
-        {'label': 'Triangle', 'value': 'triangle'}
+                                                {'label': 'Circle', 'value': 'ellipse'},
+                                                # {'label': 'Heptagon', 'value': 'heptagon'},
+                                                # {'label': 'Hexagon', 'value': 'hexagon'},
+                                                # {'label': 'Octagon', 'value': 'octagon'},
+                                                # {'label': 'Pentagon', 'value': 'pentagon'},
+                                                # {'label': 'Polygon', 'value': 'polygon'},
+                                                {'label': 'Rectangle', 'value': 'rectangle'},
+                                                {'label': 'Star', 'value': 'star'},
+                                                {'label': 'Triangle', 'value': 'triangle'}
     ]
     return [shape for shape in available_shapes if shape['value'] != grant_shape]
 
@@ -1165,15 +1167,15 @@ def update_grant_options(data):
     person_shape = data['person_shape']
     available_shapes = [
         {'label': 'Diamond', 'value': 'diamond'},
-        {'label': 'Ellipse', 'value': 'ellipse'},
-        {'label': 'Heptagon', 'value': 'heptagon'},
-        {'label': 'Hexagon', 'value': 'hexagon'},
-        {'label': 'Octagon', 'value': 'octagon'},
-        {'label': 'Pentagon', 'value': 'pentagon'},
-        {'label': 'Polygon', 'value': 'polygon'},
-        {'label': 'Rectangle', 'value': 'rectangle'},
-        {'label': 'Star', 'value': 'star'},
-        {'label': 'Triangle', 'value': 'triangle'}
+                                                {'label': 'Circle', 'value': 'ellipse'},
+                                                # {'label': 'Heptagon', 'value': 'heptagon'},
+                                                # {'label': 'Hexagon', 'value': 'hexagon'},
+                                                # {'label': 'Octagon', 'value': 'octagon'},
+                                                # {'label': 'Pentagon', 'value': 'pentagon'},
+                                                # {'label': 'Polygon', 'value': 'polygon'},
+                                                {'label': 'Rectangle', 'value': 'rectangle'},
+                                                {'label': 'Star', 'value': 'star'},
+                                                {'label': 'Triangle', 'value': 'triangle'}
     ]
     return [shape for shape in available_shapes if shape['value'] != person_shape]
 
