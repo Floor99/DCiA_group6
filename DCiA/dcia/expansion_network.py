@@ -2,7 +2,7 @@ import dash
 from dash import Input, Output, State, dcc, html
 import dash_cytoscape as cyto
 from  f_dash_components  import DropdownOptionsList,NamedRadioItems
-from new_f_feature_table import feature_table
+from f_feature_table import feature_table
 from f_load_data import load_data
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
@@ -10,9 +10,9 @@ from dash import callback_context as ctx
 cyto.load_extra_layouts()
 
 # Initialize the Dash app (assuming asset_path is defined or not needed)
-app = dash.Dash(__name__, external_stylesheets= [
-    "https://fonts.googleapis.com/css?family=Alegreya+Sans:300"
-], assets_folder="./static/assets")
+app = dash.Dash(__name__) # external_stylesheets= [
+#     "https://fonts.googleapis.com/css?family=Alegreya+Sans:300"
+# ], assets_folder="./static/assets")
 
 app.css.config.serve_locally = True
 
@@ -78,7 +78,41 @@ styles = {
                 "minWidth": "100%",
                 "height": "95vh"
             },
-    "P": {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}
+    "P": {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"},
+    "P-bold" : {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"},
+    'Button' : {"backgroundColor": "#f8f9fa",
+        "border": "1px solid #dfe0e1",
+        "borderRadius": "4px",
+        "color": "#3c4043",
+        "cursor": "pointer",
+        "fontFamily": "alegreya sans, sans-serif",
+        "fontSize": "14px",
+        "height": "36px",
+        "lineHeight": "27px",
+        "minWidth": "54px",
+        "padding": "0 16px",
+        "margin-top": "15px",
+        "textAlign": "center",
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+        "touchAction": "manipulation",
+        "whiteSpace": "pre"},
+    'Style_tabs' : {"backgroundColor": "#f8f9fa",
+        "border": "1px solid #adaeaf",
+        "borderRadius": "4px",
+        "color": "#3c4043",
+        "cursor": "pointer",
+        "fontFamily": "alegreya sans, sans-serif",
+        "fontSize": "15px",
+        "lineHeight": "55px",
+        "minWidth": "10px",
+        "padding": "0 16px",
+        "textAlign": "center",
+        "userSelect": "none",
+        "-webkit-user-select": "none",
+        "touchAction": "manipulation",
+        "whiteSpace": "pre",
+        'width': 'auto'}
 }
 
 ################################# global variable ####################################
@@ -136,16 +170,17 @@ def populate_relationships(edges: list):
 nodes_di, edges_di = populate_relationships(edges)
 
 
-default_elements = []
+default_elements = nodes_di[77795114] + edges_di[77795114]
 
 ################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
 control_panel = dcc.Tab(
-    label="Control Panel",
+    label="Control Panel", style=styles['Style_tabs'],
     children=[
-        html.P("Graph layout", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
+        html.P("Graph layout",  style = styles["P-bold"]),
         html.P("You can also change the layout of the network to see the people spread out in a different way.",
                style=styles["P"]),
+        html.P("Note that you can expand this network at most 4 times.",style=styles["P"]),
         dcc.Dropdown(
             id = "dropdown-layout",
             options = [
@@ -175,16 +210,16 @@ control_panel = dcc.Tab(
                     "expanding","not expanding"
                 ),
                 value = "not expanding"
-            )
+            )   
     ],
 )
 json_panel = dcc.Tab(
-    label="Information",
+    label="Information",style=styles['Style_tabs'],
     children=[
         html.Div(
             #style=styles["tab"],
             children=[
-                html.P("Information of Selected Node:",style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"} ),
+                html.P("Information of Selected Node:",style = styles["P-bold"] ),
                 html.Pre(
                     id="selected-node-data-json-output",
                     style=styles["json-output"],
@@ -196,7 +231,7 @@ json_panel = dcc.Tab(
 # Cytoscape network visualization component
 cytoscape_panel = html.Div(
     style= {
-        "minWidth" : "75%"
+        "minWidth" : "80%"
     },
     children=
     [
@@ -205,22 +240,28 @@ cytoscape_panel = html.Div(
             id="cytoscape",
             elements=default_elements,  
             stylesheet=[
-                # Default stylesheet
+                # Node and edge stylesheet
                 {
                     "selector": "node",
                     "style": {
-                        "opacity": 0.65,
+                        "opacity": 0.55,
                         "label" : "data(label)",
-                        'font-size': '12px'
-                        
+                        'font-size': '10px',
+                        'width': 7,
+                        'height': 7,
+                        "text-opacity": 0.8,
+                        "z-index": 9999,
+                        "shape": 'ellipse',
+                        'background-color': 'red',
+                        'line-color': 'red'
                     }
                 },
                 {
                     "selector": "edge", 
                     "style": {
                         "curve-style": "bezier", 
-                        "opacity": 0.65,
-                        "width" : 2
+                        "opacity": 0.55,
+                        "width" : 1
                     }
                 },
             ]
@@ -244,7 +285,7 @@ app.layout = html.Div(
                 ),
             ],
             style= {
-                "minWidth" : "25%"
+                "minWidth" : "20%"
             }
         ),
         cytoscape_panel
@@ -375,5 +416,5 @@ def update_layout(layout_value):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True,port = 5002)
+    app.run_server(debug=False,port = 5002)
 
