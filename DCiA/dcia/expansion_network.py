@@ -2,7 +2,7 @@ import dash
 from dash import Input, Output, State, dcc, html
 import dash_cytoscape as cyto
 from  f_dash_components  import DropdownOptionsList,NamedRadioItems
-from f_feature_table import current_node_attributes_table
+from new_f_feature_table import feature_table
 from f_load_data import load_data
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
@@ -360,7 +360,7 @@ def displaySelectedNodeData(data):
     if data and data!=None:
         for i in range(len(data)):
 
-            table1= current_node_attributes_table(data,from_att_df,to_att_df,people_to_people_df,i)
+            table1= feature_table(data,from_att_df,to_att_df,people_to_people_df,i)
             if i==0:
                 tables=[table1,]
             else:

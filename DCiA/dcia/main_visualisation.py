@@ -4,10 +4,12 @@ from dash import Input, Output, callback, Dash, html, dcc, State,callback_contex
 import dash_cytoscape as cyto
 from dash import callback_context
 cyto.load_extra_layouts()
-from f_feature_table import current_node_attributes_table
+import json
+from f_feature_table import feature_table
 from dash.exceptions import PreventUpdate
 from f_load_data import load_data
 from f_colors import check_data_types,get_colors,get_colors2
+import random
 
 # Run this app to run only the website
 app = Dash(__name__)
@@ -200,11 +202,9 @@ app.layout = html.Div(
                             children=[
                                 html.Div(
                                     children = [
-                                    # html.P("You can select a node by clicking on it, if you want to deselect a node click the button below.", style = {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}),
                                     html.Button("Deselect Node", id="bt-undo", style = style_buttons),
                                     ],
                                 ),
-                                # html.P("________________________________________________________", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
                                 html.P("Color and shape of nodes", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
                                 html.P("Determine the layout of your network. Pick a color and shape for the people and the grants in the network.", style = {"fontFamily": "alegreya sans, sans-serif", "color": "grey", "fontSize": "14px"}),
                                 html.Div(
@@ -294,7 +294,6 @@ app.layout = html.Div(
                                         html.Br(),
                                         ],
                                 ),
-                                # html.P("_______________________________________________", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
                                 html.Div(
                                     children = [
                                         html.P("Graph layout", style = {"fontFamily": "alegreya sans, sans-serif", "fontWeight": "bold"}),
@@ -302,12 +301,9 @@ app.layout = html.Div(
                                         dcc.Dropdown(
                                             id = "dropdown-layout",
                                             options = [
-                                                # {'label': 'Breadth-first', 'value': 'breadthfirst'},
-                                                # {'label': 'Circle', 'value': 'circle'},
-                                                # {'label': 'Concentric', 'value': 'concentric'},
                                                 {'label': 'Default (Cose-bilkent)', 'value': 'cose-bilkent'},
                                                 {'label': 'Grid', 'value': 'grid'},
-                                                {'label': 'Random', 'value': 'random'}
+                                                {'label': 'Random', 'value': 'random'},
                                                 ],
                                             value = "cose-bilkent",
                                             clearable = False,
@@ -340,8 +336,7 @@ app.layout = html.Div(
                                                 "fontSize": "14px",
                                                 "maxWidth": "650px"
                                             }
-                                        ),
-
+                                        ),                                        
                                         html.P(children = "Search person or grant:",
                                             style = {
                                                 "marginLeft": "3px",
@@ -349,12 +344,12 @@ app.layout = html.Div(
                                                 "fontWeight": "bold"
                                                 }
                                             ),
+                                        html.Br(),
                                         dcc.Input(
                                             id="search-input",
                                             type="text",
                                             placeholder = "Type to search..."
                                         ),
-                                        html.Br(),
                                         html.Br(),
                                         html.P(children = "Visualize attributes:",
                                                 style={
@@ -419,7 +414,8 @@ app.layout = html.Div(
                                                     "fontFamily": "alegreya sans, sans-serif"
                                                     }
                                                 ),
-                                                    dcc.Dropdown(id = "attribute-value-dropdown", style = {"fontFamily": "alegreya sans, sans-serif"} ),
+                                                    dcc.Dropdown(id = "attribute-value-dropdown", 
+                                                                 style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                                 ]),
                                                 html.Div(id = "filter-output",
                                                          style = {
@@ -484,9 +480,6 @@ app.layout = html.Div(
                 'flexDirection': 'row',
                 'alignItems': 'flex-start',
                 'width': '100%',
-                # "border": "2px solid",
-                # "border-color": "#9EA9B3",
-                # "border-radius": "10px",
                 "margin-left": "20px",
                 "margin-right": "0px",
                 "margin-bottom": "10px",
@@ -526,10 +519,6 @@ app.layout = html.Div(
     ]
 )
 
-
-
-
-
 def get_triggered_id():
     ctx = callback_context
     if not ctx.triggered:
@@ -558,6 +547,110 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
     legend2 = []
 
     if ((color_dropdown) or (color_dropdown2)) and not node:
+        if search_value:
+            stylesheet_search_value = [
+                {
+                "selector": 'node[type = "person"]',
+                "style": {
+                    "shape": person_shape,
+                    "opacity": 0.55,
+                    "width": 'data(size)',
+                    "height": 'data(size)',
+                    },
+                },
+                {
+                    "selector": 'node[type = "grant"]',
+                    "style": {
+                        "shape": grant_shape,
+                        "opacity": 0.55,
+                        "width": 'data(size)',
+                        "height": 'data(size)',
+                    },
+                    
+                },
+                {
+                    "selector": 'edge',
+                    "style": {
+                        "opacity": 0.55,
+                    }
+                },
+                {
+                    "selector": f'node[id *= "{search_value}"]',
+                    "style": {
+                        "background-color": "#B10DC9",
+                        "border-color": "purple",
+                        "border-width": 2,
+                        "border-opacity": 1,
+                        "opacity": 1,
+                        "label": "data(label)",
+                        "color": "#B10DC9",
+                        "text-opacity": 1,
+                        "font-size": 12,
+                        "z-index": 9999
+                    }
+                }
+            ]
+
+            for edge in cyto_edges:
+                if search_value in edge['data']['source'] or search_value in edge['data']['target']:
+                    if search_value in edge['data']['source']:
+                        connected_node_id = edge['data']['target']
+                        stylesheet_search_value.append({
+                            "selector": f'node[id = "{connected_node_id}"]',
+                            "style": {
+                                "background-color": target_color,
+                                "border-width": 2,
+                                "border-color": target_color,
+                                "opacity": 1,
+                                "label": "data(label)",
+                                "line-color": target_color,
+                                "text-opacity": 1,
+                                "font-size": 12,
+                                "z-index": 9999
+                            }
+                        })
+                        stylesheet_search_value.append({
+                            "selector": f'edge[source = "{search_value}"][target = "{connected_node_id}"], edge[target = "{search_value}"][source = "{connected_node_id}"]',
+                            "style": {
+                                "background-color": target_color,
+                                "line-color" : target_color,
+                                "opacity": 0.55,
+                                "z-index": 5000
+                            }
+                        })
+                    else:
+                        connected_node_id = edge['data']['source']
+                        stylesheet_search_value.append({
+                            "selector": f'node[id = "{connected_node_id}"]',
+                            "style": {
+                                "background-color": source_color,
+                                "border-width": 2,
+                                "border-color": source_color,
+                                "opacity": 1,
+                                "label": "data(label)",
+                                "line-color": source_color,
+                                "text-opacity": 1,
+                                "font-size": 12,
+                                "z-index": 9999
+                            }
+                        })
+                        stylesheet_search_value.append({
+                            "selector": f'edge[source = "{search_value}"][target = "{connected_node_id}"], edge[target = "{search_value}"][source = "{connected_node_id}"]',
+                            "style": {
+                                "background-color": source_color,
+                                "line-color" : source_color,
+                                "opacity": 0.9,
+                                "z-index": 5000
+                            }
+                        })
+            legend_items = [
+                html.Li(f"Person", style={'color': source_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+                html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+                html.Li(f"Filtered Node(s)", style={'color': 'purple', 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+                ]
+            legend = html.Ul(legend_items)
+            return stylesheet_search_value, legend, []
+            
         new_stylesheet = []
         if color_dropdown:
             drop_down_type = data_types.get(color_dropdown)
@@ -575,7 +668,21 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-
+            
+            new_stylesheet += [
+                {
+                    'selector': f'node[id="{row["id"]}"]',
+                    'style': {
+                        "opacity": 0.55,
+                        'width': 'data(size)',
+                        'height': 'data(size)',
+                        "shape": grant_shape, 
+                        'background-color': '#CCCCCC'
+                    }
+                }
+                for index, row in to_df.iterrows()
+            ]
+            
             # Generate legend based on unique colors in 'first_df'
             unique_colors = first_df[[color_dropdown, 'color']].drop_duplicates().sort_values(by=color_dropdown)
             legend_items = [
@@ -584,7 +691,6 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
             legend = html.Ul(legend_items)
 
         if color_dropdown2:
-
             drop_down_type2 = data_types2.get(color_dropdown2)
             second_df=get_colors2(to_df,color_dropdown2,drop_down_type2)
             new_stylesheet += [
@@ -600,6 +706,20 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
+            
+            new_stylesheet += [
+                {
+                    'selector': f'node[id="{row["id"]}"]',
+                    'style': {
+                        "opacity": 0.55,
+                        'width': 'data(size)',
+                        'height': 'data(size)',
+                        "shape": person_shape, 
+                        'background-color': '#CCCCCC'
+                    }
+                }
+                for index, row in from_df.iterrows()
+            ]
 
             # Generate legend based on unique colors in 'second_df'
             unique_colors2 = second_df[[color_dropdown2, 'color']].drop_duplicates().sort_values(by=color_dropdown2)
@@ -607,6 +727,53 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 html.Li(f"{color_dropdown2}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors2.itertuples(index=False)]
             legend2 = html.Ul(legend_items2)
+            
+        if (color_dropdown and color_dropdown2) and not node:
+            drop_down_type = data_types.get(color_dropdown)
+            first_df = get_colors(from_df, color_dropdown, drop_down_type)
+            new_stylesheet += [
+                {
+                    'selector': f'node[id="{row["id"]}"]',
+                    'style': {
+                    "opacity": 0.55,
+                        'width': 'data(size)',
+                        'height': 'data(size)',
+                        "shape": person_shape,
+                        'background-color': row['color'],  # Set a random color for each node of type "person"
+                    }
+                }
+                for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
+            ]
+            
+            drop_down_type2 = data_types2.get(color_dropdown2)
+            second_df=get_colors2(to_df,color_dropdown2,drop_down_type2)
+            new_stylesheet += [
+                {
+                    'selector': f'node[id="{row["id"]}"]',
+                    'style': {
+                    "opacity": 0.55,
+                        'width': 'data(size)',
+                        'height': 'data(size)',
+                        "shape": grant_shape,
+                        'background-color': row['color'],  # Set a random color for each node of type "person"
+                    }
+                }
+                for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
+            ]
+            
+            # Generate legend based on unique colors in 'first_df'
+            unique_colors = first_df[[color_dropdown, 'color']].drop_duplicates().sort_values(by=color_dropdown)
+            legend_items = [
+                html.Li(f"{color_dropdown}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+                for filtered_column, color in unique_colors.itertuples(index=False)]
+            legend = html.Ul(legend_items)
+            
+            # Generate legend based on unique colors in 'second_df'
+            unique_colors2 = second_df[[color_dropdown2, 'color']].drop_duplicates().sort_values(by=color_dropdown2)
+            legend_items2 = [
+                html.Li(f"{color_dropdown2}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+                for filtered_column, color in unique_colors2.itertuples(index=False)]
+            legend2 = html.Ul(legend_items2)    
 
         new_stylesheet += [
             {
@@ -617,8 +784,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     }}]
 
         return new_stylesheet, legend, legend2
-
-    if triggered_id == "search-input":
+    elif triggered_id == "search-input":
         if search_value == None and selected_nodes == []:
             stylesheet = [
                 {
@@ -698,7 +864,8 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 {
                     "selector": 'node[type = "person"]',
                     "style": {
-                        "opacity": 0.55,'width': 'data(size)',
+                        "opacity": 0.55,
+                        'width': 'data(size)',
                         'height': 'data(size)',
                         "shape": person_shape
                         }
@@ -706,7 +873,8 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 {
                     "selector": 'node[type = "grant"]',
                     "style": {
-                        "opacity": 0.55,'width': 'data(size)',
+                        "opacity": 0.55,
+                        'width': 'data(size)',
                         'height': 'data(size)',
                         "shape": grant_shape
                         }
@@ -731,7 +899,6 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "text-opacity": 1,
                         "font-size": 12,
                         "z-index": 9999,
-
                         "text-opacity": 0.8,
                     "font-size": 12,
                     },
@@ -745,8 +912,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'node[id = "{edge["target"]}"]',
                             "style": {
                                 "background-color": target_color,
-
-                                 "opacity": 0.9,
+                                 "opacity": 0.55,
                                   "z-index": 9999},
                         }
                     )
@@ -755,7 +921,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'edge[id= "{edge["id"]}"]',
                             "style": {
                                 "line-color": target_color,
-                                "opacity": 0.9,
+                                "opacity": 0.55,
                                 "z-index": 5000,
                             },
                         }
@@ -767,8 +933,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "selector": f'node[id = "{edge["source"]}"]',
                             "style": {
                                 "background-color": source_color,
-
-                                "opacity": 0.9,
+                                "opacity": 0.55,
                                 "z-index": 9999,
                             },
                         }
@@ -785,30 +950,37 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     )
             legend_items = [
                 html.Li(f"Person", style={'color': source_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
-                html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+                html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+                html.Li(f"Selected Node", style={'color': 'purple', 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 ]
             legend = html.Ul(legend_items)
             return stylesheet, legend, []
 
-        stylesheet_search_value = [
+        else:
+            stylesheet_search_value = [
              {
             "selector": 'node[type = "person"]',
             "style": {
                 "shape": person_shape,
-                "opacity": 0.9,
+                "opacity": 0.55,
+                "width": "data(size)",
+                "height": "data(size)",
                 },
             },
             {
                 "selector": 'node[type = "grant"]',
                 "style": {
                     "shape": grant_shape,
-                    "opacity": 0.9,
+                    "opacity": 0.55,
+                    "width": "data(size)",
+                    "height": "data(size)",
                 },
             },
             {
                 "selector": 'edge',
                 "style": {
-                    "opacity": 0.9,
+                    "opacity": 0.2,
+                    "width": "2"
                 }
             },
             {
@@ -851,7 +1023,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "style": {
                             "background-color": target_color,
                             "line-color" : target_color,
-                            "opacity": 0.9,
+                            "opacity": 0.55,
                             "z-index": 5000
                         }
                     })
@@ -876,17 +1048,17 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "style": {
                             "background-color": source_color,
                             "line-color" : source_color,
-                            "opacity": 0.9,
+                            "opacity": 0.55,
                             "z-index": 5000
                         }
                     })
         legend_items = [
             html.Li(f"Person", style={'color': source_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
-            html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+            html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+            html.Li(f"Filtered Node(s)", style={'color': 'purple', 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
             ]
         legend = html.Ul(legend_items)
         return stylesheet_search_value, legend, []
-
     else:
         if not node:
             stylesheet = [
@@ -930,7 +1102,8 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
             {
                 "selector": 'node[type = "person"]',
                 "style": {
-                   "opacity": 0.55,'width': 'data(size)',
+                   "opacity": 0.55,
+                   'width': 'data(size)',
                     'height': 'data(size)',
                     "shape": person_shape
                     }
@@ -977,7 +1150,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                     {
                         "selector": f'node[id = "{edge["target"]}"]',
                         "style": {"background-color": target_color,"label": "data(label)","text-opacity": 0.8,
-                    "font-size": 12, "opacity": 0.9},
+                    "font-size": 12, "opacity": 0.55},
                     }
                 )
                 stylesheet.append(
@@ -985,7 +1158,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "selector": f'edge[id= "{edge["id"]}"]',
                         "style": {
                             "line-color": target_color,
-                            "opacity": 0.9,
+                            "opacity": 0.55,
                             "z-index": 5000,
                         },
                     }
@@ -1000,7 +1173,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                             "label": "data(label)",
                             "text-opacity": 0.8,
                             "font-size": 12,
-                            "opacity": 0.9,
+                            "opacity": 0.55,
                             "z-index": 9999,
                             'width': 'data(size)',
                             'height': 'data(size)',
@@ -1017,12 +1190,13 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         },
                     }
                 )
-    legend_items = [
-        html.Li(f"Person", style={'color': source_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
-        html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
-        ]
-    legend = html.Ul(legend_items)
-    return stylesheet, legend, []
+        legend_items = [
+            html.Li(f"Person", style={'color': source_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+            html.Li(f"Grant", style={'color': target_color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"}),
+            html.Li(f"Selected Node", style={'color': 'purple', 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
+            ]
+        legend = html.Ul(legend_items)
+        return stylesheet, legend, []
 
 @app.callback(
     Output("input-source-color", "style"), Input("input-source-color", "value"))
@@ -1106,14 +1280,22 @@ def reset_layout(person_shape, grant_shape, source_color, target_color, n_clicks
 
 @callback(
     Output("selected-node-data-json-output", "children", allow_duplicate=True),
-    Input("cytoscape", "selectedNodeData"),
-    prevent_initial_call = True
+    [
+        Input("cytoscape", "selectedNodeData"),
+        Input("search-input", "value")
+    ],
+    prevent_initial_call=True
 )
-def displaySelectedNodeData(data):
-    if data and data!=None:
-        for i in range(len(data)):
+def displaySelectedNodeData(data, search_value):
+    ctx = callback_context
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-            table1= current_node_attributes_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+    if triggered_id == "search-input" and search_value:
+        return feature_table(search_value, from_att_df, to_att_df, grant_to_people_df, 0)
+    elif triggered_id == "cytoscape" and data:
+        tables = []
+        for i in range(len(data)):
+            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
                 tables=[table1,]
             else:
@@ -1123,21 +1305,28 @@ def displaySelectedNodeData(data):
 
 @callback(
     Output("selected-node-data-json-output-filter", "children", allow_duplicate=True),
-    Input("cytoscape", "selectedNodeData"),
-    prevent_initial_call = True
+    [
+        Input("cytoscape", "selectedNodeData"),
+        Input("search-input", "value")
+    ],
+    prevent_initial_call=True
 )
-def displaySelectedNodeData(data):
-    if data and data!=None:
-        for i in range(len(data)):
+def displaySelectedNodeData(data, search_value):
+    ctx = callback_context
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-            table1= current_node_attributes_table(data,from_att_df,to_att_df,grant_to_people_df,i)
+    if triggered_id == "search-input" and search_value:
+        return feature_table(search_value, from_att_df, to_att_df, grant_to_people_df, 0)
+    elif triggered_id == "cytoscape" and data:
+        tables = []
+        for i in range(len(data)):
+            table1= feature_table(data,from_att_df,to_att_df,grant_to_people_df,i)
             if i==0:
                 tables=[table1,]
             else:
                 tables.extend([table1,])
         return tables
     raise PreventUpdate
-
 
 @app.callback(
     Output('dropdown-node-shape-person', 'options'),
@@ -1146,16 +1335,16 @@ def displaySelectedNodeData(data):
 def update_person_options(data):
     grant_shape = data['grant_shape']
     available_shapes = [
-        {'label': 'Diamond', 'value': 'diamond'},
-                                                {'label': 'Circle', 'value': 'ellipse'},
-                                                # {'label': 'Heptagon', 'value': 'heptagon'},
-                                                # {'label': 'Hexagon', 'value': 'hexagon'},
-                                                # {'label': 'Octagon', 'value': 'octagon'},
-                                                # {'label': 'Pentagon', 'value': 'pentagon'},
-                                                # {'label': 'Polygon', 'value': 'polygon'},
-                                                {'label': 'Rectangle', 'value': 'rectangle'},
-                                                {'label': 'Star', 'value': 'star'},
-                                                {'label': 'Triangle', 'value': 'triangle'}
+         {'label': 'Diamond', 'value': 'diamond'},
+        {'label': 'Circle', 'value': 'ellipse'},
+        # {'label': 'Heptagon', 'value': 'heptagon'},
+        # {'label': 'Hexagon', 'value': 'hexagon'},
+        # {'label': 'Octagon', 'value': 'octagon'},
+        # {'label': 'Pentagon', 'value': 'pentagon'},
+        # {'label': 'Polygon', 'value': 'polygon'},
+        {'label': 'Rectangle', 'value': 'rectangle'},
+        {'label': 'Star', 'value': 'star'},
+        {'label': 'Triangle', 'value': 'triangle'}
     ]
     return [shape for shape in available_shapes if shape['value'] != grant_shape]
 
@@ -1167,15 +1356,15 @@ def update_grant_options(data):
     person_shape = data['person_shape']
     available_shapes = [
         {'label': 'Diamond', 'value': 'diamond'},
-                                                {'label': 'Circle', 'value': 'ellipse'},
-                                                # {'label': 'Heptagon', 'value': 'heptagon'},
-                                                # {'label': 'Hexagon', 'value': 'hexagon'},
-                                                # {'label': 'Octagon', 'value': 'octagon'},
-                                                # {'label': 'Pentagon', 'value': 'pentagon'},
-                                                # {'label': 'Polygon', 'value': 'polygon'},
-                                                {'label': 'Rectangle', 'value': 'rectangle'},
-                                                {'label': 'Star', 'value': 'star'},
-                                                {'label': 'Triangle', 'value': 'triangle'}
+        {'label': 'Circle', 'value': 'ellipse'},
+        # {'label': 'Heptagon', 'value': 'heptagon'},
+        # {'label': 'Hexagon', 'value': 'hexagon'},
+        # {'label': 'Octagon', 'value': 'octagon'},
+        # {'label': 'Pentagon', 'value': 'pentagon'},
+        # {'label': 'Polygon', 'value': 'polygon'},
+        {'label': 'Rectangle', 'value': 'rectangle'},
+        {'label': 'Star', 'value': 'star'},
+        {'label': 'Triangle', 'value': 'triangle'}
     ]
     return [shape for shape in available_shapes if shape['value'] != person_shape]
 
@@ -1269,69 +1458,35 @@ def filter_nodes_by_attribute(selected_value, selected_attribute, elements, filt
         Input("bt-undo1", "n_clicks"),
         Input("color-dropdown2", "value"),
         Input("color-dropdown", "value"),
-    ], prevent_initial_call=True)
+    ], prevent_initial_call=True
+)
 def reset_stylesheet_on_tap(nclicks, n_clicks1, color2, color1):
     if (nclicks or n_clicks1):
         return  None, None, None, None, color2, color1
     else:
         return  no_update, no_update, no_update, no_update, no_update, no_update
 
-
 @app.callback(
     [
-        Output("cytoscape", "stylesheet", allow_duplicate=True),
         Output("color-dropdown", "value", allow_duplicate=True),
         Output("color-dropdown2", "value", allow_duplicate=True),
+        Output("search-input", "value", allow_duplicate=True),
     ],
     [
-        Input("dropdown-node-shape-person", "value"),
-        Input("dropdown-node-shape-grant", "value"),
-        Input("input-source-color", "value"),
-        Input("input-target-color", "value"),
         Input("color-dropdown", "value"),
         Input("color-dropdown2", "value"),
     ],
     prevent_initial_call=True
 )
-def reset_dropdowns(person_shape, grant_shape, source_color, target_color, dropdown_value1, dropdown_value2):
-    default_stylesheet = [
-            {
-                "selector": 'node[type="person"]',
-                "style": {
-                    "background-color": source_color,
-                    "shape": person_shape,
-                    "width": "data(size)",
-                    "height": "data(size)",
-                    "opacity": 0.55
-                }
-            },
-            {
-                "selector": 'node[type="grant"]',
-                "style": {
-                    "background-color": target_color,
-                    "shape": grant_shape,
-                    "width": "data(size)",
-                    "height": "data(size)",
-                    "opacity": 0.55
-                }
-            },
-            {
-                "selector": "edge",
-                "style": {
-                    "curve-style": "bezier",
-                    "opacity": 0.2,
-                    "width": "2"
-                }
-            }
-        ]
+def reset_dropdowns(dropdown_value1, dropdown_value2):
     if dropdown_value1 is None:
-        return default_stylesheet, None, dropdown_value2
+        return None, dropdown_value2, ""
     elif dropdown_value2 is None:
-         return default_stylesheet, dropdown_value1, None
+        return dropdown_value1, None, ""
     elif (dropdown_value1 is None) and (dropdown_value2 is None):
-        return default_stylesheet, None, None
+        return None, None, ""
     else:
-        return no_update, no_update, no_update
+        return no_update, no_update, ""
 
 if __name__ == "__main__":
     app.run(debug=False, port=5003)
