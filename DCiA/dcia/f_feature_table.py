@@ -2,64 +2,68 @@ import pandas as pd
 from dash import html
 from typing import Dict, Any
 
-stylesheet= {
-            'fontFamily': "alegreya sans, sans-serif",
-            'fontSize': '16px',
-            'textAlign': 'center',
-            'width' : '100%',
-            'table-layout': 'fixed',
-        }
-td_stylesheet= {
-            'width' : '50%'
-        }
-def current_node_attributes_table(cytoscape_nodes : Dict[str, Any], source_att_df : pd.DataFrame, target_att_df : pd.DataFrame, adjency_list_df : pd.DataFrame, node_index: int ):
-        NODE_ID = int(cytoscape_nodes[node_index]["id"])
-        node_is_in_source_df = NODE_ID in source_att_df['Node'].values
-        
-        node_df = source_att_df if node_is_in_source_df else target_att_df
+# Define styles for the tables
+stylesheet = {
+    'fontFamily': "alegreya sans, sans-serif",
+    'fontSize': '16px',
+    'textAlign': 'center',
+    'width': '100%',
+    'table-layout': 'fixed',
+    'borderCollapse': 'collapse',
+    'border': '1px solid black',
+    'background-color': '#dfe0e1',
+    'marginRight': '10px',
+    'marginBottom': '10px'
+}
 
-        node_attributes = node_df[node_df['Node'] == NODE_ID].iloc[0].drop(["index","Node","Node_Size"]).to_dict()
+td_stylesheet = {
+    'width': '50%'
+}
 
-        # Prepend "Current Node : ID" to the attributes list.
-        node_attributes = { 'Current Node': 100, **node_attributes }
-        
-        # Truncate the keys with an elipsis when it is too long
-        node_attributes = {truncate_string(key, 19): value for key, value in node_attributes.items()}
+def feature_table(cytoscape_nodes: Dict[str, Any], source_att_df: pd.DataFrame, target_att_df: pd.DataFrame, adjency_list_df: pd.DataFrame, node_index: int):
+    # Determine NODE_ID based on whether cytoscape_nodes is a list or a single node
+    if isinstance(cytoscape_nodes, list):
+        NODE_ID = str(cytoscape_nodes[node_index]["id"])
+    else:
+        NODE_ID = str(cytoscape_nodes)
 
-        # Find the adjacent nodes in the given dataframe of structure: From to
-        adjacent_nodes_df = adjency_list_df.loc[adjency_list_df['from'] == NODE_ID]['to']
+    # Concatenate the source and target attribute dataframes
+    combined_df = pd.concat([
+        source_att_df[source_att_df['Node'].astype(str).str.startswith(NODE_ID)],
+        target_att_df[target_att_df['Node'].astype(str).str.startswith(NODE_ID)]
+    ])
+    print(combined_df)
 
-        return html.Div([
-            html.Table(
-                # Header
-                [
-                    html.Tr([
-                                html.Th("Attribute", style= td_stylesheet), html.Th("Value", style= td_stylesheet)
-                            ], style= td_stylesheet)
-                ] +
-                [
-                    html.Tr([
-                                html.Td(key, style= td_stylesheet), html.Td(value, style= td_stylesheet)
-                            ], style= td_stylesheet) for key, value in node_attributes.items()
-                ],
-                style=stylesheet
-            ),
-            html.Hr(),
-            html.Table(
-                # Header
-                [
-                    html.Tr([
-                                html.Th('Connected Nodes'), html.Th('')
-                            ], style= td_stylesheet)
-                ] +
-                # Body
-                [
-                        html.Tr(
-                                    html.Td(val),
-                                    style= td_stylesheet) for val in adjacent_nodes_df.values
-                ],
-                style=stylesheet
-            )
-        ], style= {"width" : "100%"})
-def truncate_string(string: str, limit: int):
-    return string[:limit] + '…' if len(string) > limit else string
+    combined_html = []
+    for _, row in combined_df.iterrows():
+        node_id = row['Node']
+        # Create a DataFrame for displaying attributes, excluding 'Node_Size'
+        attributes_df = pd.DataFrame([("Selected Node", node_id)] + list(row.drop(['Node', 'Node_Size']).items()), columns=['Attribute', 'Value'])
+        attributes_df['Attribute'] = attributes_df['Attribute'].apply(truncate_with_dots)
+
+        # Get connected nodes from adjacency list
+        connected_nodes_df = adjency_list_df[adjency_list_df['from'] == node_id]['to']
+
+        # Append generated HTML for attributes and connected nodes to combined_html
+        combined_html.append(generate_table_html(attributes_df, connected_nodes_df))
+
+    return html.Div(combined_html, style={"width": "100%"})
+
+def generate_table_html(attributes_df, connected_nodes_df):
+    return html.Div([
+        html.Table(
+            [html.Tr([html.Th(col, style=td_stylesheet) for col in attributes_df.columns])] +
+            [html.Tr([html.Td(attributes_df.at[idx, col], style=td_stylesheet) for col in attributes_df.columns]) for idx in attributes_df.index],
+            style=stylesheet
+        ),
+        html.Hr(),
+        html.Table(
+            [html.Tr([html.Th('Connected Nodes', style=td_stylesheet)])] +
+            [html.Tr([html.Td(node, style=td_stylesheet)]) for node in connected_nodes_df],
+            style=stylesheet
+        )
+    ])
+
+def truncate_with_dots(string):
+    # Truncate strings longer than 20 characters
+    return string[:18] + "..." if len(string) > 20 else string
