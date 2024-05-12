@@ -6,6 +6,7 @@ from f_feature_table import feature_table
 from f_load_data import load_data
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
+import pandas as pd
 # Load extra layouts for Cytoscape
 cyto.load_extra_layouts()
 
@@ -17,7 +18,9 @@ app = dash.Dash(__name__) # external_stylesheets= [
 app.css.config.serve_locally = True
 
 # ################################# LOAD DATA ################################
-people_to_people_df, grant_to_people_df,from_att_df,to_att_df = load_data()
+att_table = pd.read_excel('dcia/static/data/attributes_final.xlsx')
+people_to_people_df= pd.read_csv('dcia/static/data/people_to_people.csv')
+from_att_df,to_att_df = load_data(att_table,people_to_people_df)
 
 # ############################## PREPROCESS DATA #############################
 # Drop druplicates
@@ -71,7 +74,7 @@ styles = {
     "json-output": {
         "overflow-y": "scroll",
         "height": "calc(50% - 25px)",
-        "border": "thin lightgrey solid",
+        "border": "none",
     },
     "tab": {"height": "calc(98vh - 80px)"},
     "cytoscape" : {
