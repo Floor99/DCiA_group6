@@ -30,7 +30,7 @@ nodes = set()
 
 ########################### Deze Code is voor nu niet nodig #######################################
 # # Data looks like this
-# # From          To 
+# # From          To
 # # People        Grant
 # # Source        Target
 
@@ -44,7 +44,7 @@ for index, edge in edges.iterrows():
         nodes.add(source)
         cyto_nodes.append({
             "data": {
-                "id": str(source), 
+                "id": str(source),
                 "label": str(source)
             }
         })
@@ -52,18 +52,18 @@ for index, edge in edges.iterrows():
         nodes.add(target)
         cyto_nodes.append({
             "data": {
-                "id": str(target), 
+                "id": str(target),
                 "label": str(target)
             }
         })
-        
+
     cyto_edges.append({
         "data": {
-            "source": str(source), 
+            "source": str(source),
             "target": str(target)
             }
         })
-    
+
 ########################### Stylesheet ##########################################################
 
 # Define the cytoscape stylesheet
@@ -163,7 +163,7 @@ def populate_relationships(edges: list):
                 node_di[node].append({'data': {'id': str(edge['data']['source']), 'label': str(edge['data']['source'])}})
             if str(node) != edge['data']['target']:
                 node_di[node].append({'data': {'id': str(edge['data']['target']), 'label': str(edge['data']['target'])}})
-        
+
     return node_di, edges_di
 
 ######################################## Initiate functions ####################################################
@@ -210,7 +210,7 @@ control_panel = dcc.Tab(
                     "expanding","not expanding"
                 ),
                 value = "not expanding"
-            )   
+            )
     ],
 )
 json_panel = dcc.Tab(
@@ -238,7 +238,7 @@ cytoscape_panel = html.Div(
         cyto.Cytoscape(
             style= styles["cytoscape"],
             id="cytoscape",
-            elements=default_elements,  
+            elements=default_elements,
             stylesheet=[
                 # Node and edge stylesheet
                 {
@@ -257,9 +257,9 @@ cytoscape_panel = html.Div(
                     }
                 },
                 {
-                    "selector": "edge", 
+                    "selector": "edge",
                     "style": {
-                        "curve-style": "bezier", 
+                        "curve-style": "bezier",
                         "opacity": 0.55,
                         "width" : 1
                     }
@@ -294,11 +294,12 @@ app.layout = html.Div(
     {
         "display": "flex",
         "flexDirection": "row",
+        "margin": "15px",
         "width": "100%"
     },
 )
 
-                
+
 
 # Define callbacks for interactive features (node/edge taps, layout changes, etc.)
 # Include callbacks for updating the layout, displaying JSON data, and expanding nodes
@@ -312,7 +313,7 @@ app.layout = html.Div(
 )
 def generate_elements(nodeData: dict, elements: dict,expansion_mode:str) -> dict:
     """
-    Expands with all connections to the selected node. 
+    Expands with all connections to the selected node.
     :param dict nodeData: nodedata contains: (expanded: bool), (class: string) and (data: dict) with (id: string), (label: string)
     :param dict elements: all elements returned from cytoscape.
     :param str expansion_mode: gives the value from the radio_button
@@ -329,12 +330,12 @@ def generate_elements(nodeData: dict, elements: dict,expansion_mode:str) -> dict
 
     # Node has already been expanded or there is no NodeData; no further action is necessary.
     if not nodeData or nodeData["data"].get("expanded"):
-        return elements 
-    
+        return elements
+
     # If the expansion counter exceeds 4, prevent further expansion
     if expansion_counter > 4:
         raise PreventUpdate
-    
+
     # Mark the node as expanded to prevent re-expansion.
     for element in elements:
 
@@ -342,26 +343,26 @@ def generate_elements(nodeData: dict, elements: dict,expansion_mode:str) -> dict
             element["data"]["expanded"] = True
             break
 
-    # Add follower nodes and edges. 
+    # Add follower nodes and edges.
     followers_nodes = nodes_di.get(int(nodeData["data"]["id"]))
     followers_edges = edges_di.get(int(nodeData["data"]["id"]))
     if followers_nodes:
         for node in followers_nodes:
             node["classes"] = "followerNode"
         elements.extend(followers_nodes)
-    
+
         if followers_edges:
             for follower_edge in followers_edges:
                 follower_edge["classes"] = "followerEdge"
             elements.extend(followers_edges)
-    
+
     # Increment the expansion counter
     expansion_counter += 1
 
     return elements
 
 @app.callback(
-    Output("cytoscape", "elements",allow_duplicate=True), 
+    Output("cytoscape", "elements",allow_duplicate=True),
     Input("search-input", "value"),
     Input("search-input","n_submit"),
     prevent_initial_call=True
@@ -371,10 +372,10 @@ def update_graph(search_value: str,n_submit: int):
     if not ctx.triggered or ctx.triggered[0]['prop_id'] != 'search-input.n_submit':
         # Callback was not triggered by pressing Enter, return empty elements
         return []
-    
+
     if not search_value:
         return []
-    
+
     filtered_data_edges = []
     filtered_data_nodes = set()
     new_nodes = []
@@ -383,9 +384,9 @@ def update_graph(search_value: str,n_submit: int):
         if edge['data']['source'] == search_value or edge['data']['target'] == search_value:
             filtered_data_edges.append(edge)
             filtered_data_nodes.update([edge['data']['source'], edge['data']['target']])
-    
+
     for node in nodes_di[int(search_value)]:
-        
+
         if node['data']['id'] in filtered_data_nodes:
             new_nodes.append(node)
 
@@ -417,4 +418,3 @@ def update_layout(layout_value):
 
 if __name__ == "__main__":
     app.run_server(debug=False,port = 5002)
-
