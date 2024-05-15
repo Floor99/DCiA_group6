@@ -173,7 +173,7 @@ def populate_relationships(edges: list):
 nodes_di, edges_di = populate_relationships(edges)
 
 
-default_elements = nodes_di[77795114] + edges_di[77795114]
+default_elements = []
 
 ################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
