@@ -339,7 +339,7 @@ app.layout = html.Div(
                                                 "fontSize": "14px",
                                                 "maxWidth": "650px"
                                             }
-                                        ),                                        
+                                        ),
                                         html.P(children = "Search person or grant:",
                                             style = {
                                                 "marginLeft": "3px",
@@ -347,12 +347,12 @@ app.layout = html.Div(
                                                 "fontWeight": "bold"
                                                 }
                                             ),
-                                        html.Br(),
                                         dcc.Input(
                                             id="search-input",
                                             type="text",
                                             placeholder = "Type to search..."
                                         ),
+                                        html.Br(),
                                         html.Br(),
                                         html.P(children = "Visualize attributes:",
                                                 style={
@@ -417,7 +417,7 @@ app.layout = html.Div(
                                                     "fontFamily": "alegreya sans, sans-serif"
                                                     }
                                                 ),
-                                                    dcc.Dropdown(id = "attribute-value-dropdown", 
+                                                    dcc.Dropdown(id = "attribute-value-dropdown",
                                                                  style = {"fontFamily": "alegreya sans, sans-serif"} ),
                                                 ]),
                                                 html.Div(id = "filter-output",
@@ -439,7 +439,7 @@ app.layout = html.Div(
                                 ]
                             ),
                             dcc.Tab(
-                                label="Remove Nodes",
+                                label="Remove",
                                 style = style_tabs,
                                 children=[
                                     html.Button("Remove Selected Node", id="remove-button", style = style_buttons,),
@@ -569,7 +569,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "width": 'data(size)',
                         "height": 'data(size)',
                     },
-                    
+
                 },
                 {
                     "selector": 'edge',
@@ -653,7 +653,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 ]
             legend = html.Ul(legend_items)
             return stylesheet_search_value, legend, []
-            
+
         new_stylesheet = []
         if color_dropdown:
             drop_down_type = data_types.get(color_dropdown)
@@ -671,7 +671,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             new_stylesheet += [
                 {
                     'selector': f'node[id="{row["id"]}"]',
@@ -679,13 +679,13 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "opacity": 0.55,
                         'width': 'data(size)',
                         'height': 'data(size)',
-                        "shape": grant_shape, 
+                        "shape": grant_shape,
                         'background-color': '#CCCCCC'
                     }
                 }
                 for index, row in to_df.iterrows()
             ]
-            
+
             # Generate legend based on unique colors in 'first_df'
             unique_colors = first_df[[color_dropdown, 'color']].drop_duplicates().sort_values(by=color_dropdown)
             legend_items = [
@@ -709,7 +709,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             new_stylesheet += [
                 {
                     'selector': f'node[id="{row["id"]}"]',
@@ -717,7 +717,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                         "opacity": 0.55,
                         'width': 'data(size)',
                         'height': 'data(size)',
-                        "shape": person_shape, 
+                        "shape": person_shape,
                         'background-color': '#CCCCCC'
                     }
                 }
@@ -730,7 +730,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 html.Li(f"{color_dropdown2}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors2.itertuples(index=False)]
             legend2 = html.Ul(legend_items2)
-            
+
         if (color_dropdown and color_dropdown2) and not node:
             drop_down_type = data_types.get(color_dropdown)
             first_df = get_colors(from_df, color_dropdown, drop_down_type)
@@ -747,7 +747,7 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in first_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             drop_down_type2 = data_types2.get(color_dropdown2)
             second_df=get_colors2(to_df,color_dropdown2,drop_down_type2)
             new_stylesheet += [
@@ -763,20 +763,20 @@ def generate_stylesheet(person_shape, grant_shape, source_color, target_color, s
                 }
                 for index, row in second_df.iterrows()  # Iterate over the values in the "ID" column of the DataFrame
             ]
-            
+
             # Generate legend based on unique colors in 'first_df'
             unique_colors = first_df[[color_dropdown, 'color']].drop_duplicates().sort_values(by=color_dropdown)
             legend_items = [
                 html.Li(f"{color_dropdown}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors.itertuples(index=False)]
             legend = html.Ul(legend_items)
-            
+
             # Generate legend based on unique colors in 'second_df'
             unique_colors2 = second_df[[color_dropdown2, 'color']].drop_duplicates().sort_values(by=color_dropdown2)
             legend_items2 = [
                 html.Li(f"{color_dropdown2}: {filtered_column}", style={'color': color, 'margin': '5px', "fontFamily": "alegreya sans, sans-serif"})
                 for filtered_column, color in unique_colors2.itertuples(index=False)]
-            legend2 = html.Ul(legend_items2)    
+            legend2 = html.Ul(legend_items2)
 
         new_stylesheet += [
             {
