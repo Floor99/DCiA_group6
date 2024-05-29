@@ -1,3 +1,4 @@
+# Load in Packages
 import dash
 from dash import Input, Output, State, dcc, html
 import dash_cytoscape as cyto
@@ -7,19 +8,18 @@ from f_load_data import load_data
 from dash.exceptions import PreventUpdate
 from dash import callback_context as ctx
 import pandas as pd
+from typing import Tuple
 # Load extra layouts for Cytoscape
 cyto.load_extra_layouts()
 
 # Initialize the Dash app (assuming asset_path is defined or not needed)
-app = dash.Dash(__name__) # external_stylesheets= [
-#     "https://fonts.googleapis.com/css?family=Alegreya+Sans:300"
-# ], assets_folder="./static/assets")
+app = dash.Dash(__name__) 
 
 app.css.config.serve_locally = True
 
 # ################################# LOAD DATA ################################
-att_table = pd.read_excel('dcia/static/data/attributes_final.xlsx')
-people_to_people_df= pd.read_csv('dcia/static/data/people_to_people.csv')
+att_table:pd.DataFrame = pd.read_excel('dcia/static/data/attributes_final.xlsx')
+people_to_people_df: pd.DataFrame= pd.read_csv('dcia/static/data/people_to_people.csv')
 from_att_df,to_att_df = load_data(att_table,people_to_people_df)
 
 # ############################## PREPROCESS DATA #############################
@@ -28,44 +28,8 @@ edge_data = people_to_people_df.drop_duplicates(keep="first").reset_index(drop=T
 # Remove self-edges(edges where the source and target nodes are the same)
 edge_data = edge_data[edge_data['from'] != edge_data['to']].reset_index(drop=True)
 
-edges = edge_data.copy()
-nodes = set()
-
-########################### Deze Code is voor nu niet nodig #######################################
-# # Data looks like this
-# # From          To
-# # People        Grant
-# # Source        Target
-
-cyto_edges = []
-cyto_nodes = []
-
-for index, edge in edges.iterrows():
-    source, target = edge['from'], edge['to']
-
-    if source not in nodes:
-        nodes.add(source)
-        cyto_nodes.append({
-            "data": {
-                "id": str(source),
-                "label": str(source)
-            }
-        })
-    if target not in nodes:
-        nodes.add(target)
-        cyto_nodes.append({
-            "data": {
-                "id": str(target),
-                "label": str(target)
-            }
-        })
-
-    cyto_edges.append({
-        "data": {
-            "source": str(source),
-            "target": str(target)
-            }
-        })
+edges:list = edge_data.copy()
+nodes:set = set()
 
 ########################### Stylesheet ##########################################################
 
@@ -124,10 +88,18 @@ expansion_counter:int = 0
 
 ########################### Functions ###################################################################
 # Initialize global data structures for node expansion (followers and following)
-def populate_relationships(edges: list):
-    """This function creates and populates dictionaries for an undirected network representing nodes and edges in the graph."""
-    node_di = {}
-    edges_di = {}
+def populate_relationships(edges: list) -> Tuple[dict,dict]:
+    """
+    This function creates and populates dictionaries for an undirected network representing the connected nodes and edges in the graph.
+    
+    Parameters:
+    - edges (list): A list containing the edges of a network in the following format (from,to).
+
+    Returns:
+    - Tuple[dict,dict]: Two dictionaries (node_di and edges_di) containing all connected nodes and edges of a particular node or edge.
+    """
+    node_di:dict = {}
+    edges_di:dict = {}
 
     # Iterate through each edge to populate dictionaries
     for index, edge in edges.iterrows():
@@ -177,6 +149,8 @@ default_elements = []
 
 ################################### Dash Components #######################################################
 # Define the app layout, integrating the control panel and cytoscape component
+
+# The Control panel tab
 control_panel = dcc.Tab(
     label="Control Panel", style=styles['Style_tabs'],
     children=[
@@ -216,6 +190,8 @@ control_panel = dcc.Tab(
             )
     ],
 )
+
+# The json panel tab
 json_panel = dcc.Tab(
     label="Information",style=styles['Style_tabs'],
     children=[
@@ -271,8 +247,9 @@ cytoscape_panel = html.Div(
         )
     ])
 
+# The web application layout (combining all previous HTML components)
 app.layout = html.Div(
-    [ html.Link(
+    [ html.Link( # add bootstrap theme for the other html components
         rel='stylesheet',
         href='https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cosmo/bootstrap.min.css'
     ),
@@ -302,10 +279,6 @@ app.layout = html.Div(
     },
 )
 
-
-
-# Define callbacks for interactive features (node/edge taps, layout changes, etc.)
-# Include callbacks for updating the layout, displaying JSON data, and expanding nodes
 ############################### Callbacks ################################################################
 @app.callback(
     Output("cytoscape", "elements",allow_duplicate=True),
@@ -329,7 +302,6 @@ def generate_elements(nodeData: dict, elements: dict,expansion_mode:str) -> dict
     # If the button is on not expanding and the user clicks; no further action is necessary
     if expansion_mode == "not expanding":
         return elements
-
 
     # Node has already been expanded or there is no NodeData; no further action is necessary.
     if not nodeData or nodeData["data"].get("expanded"):
@@ -370,7 +342,14 @@ def generate_elements(nodeData: dict, elements: dict,expansion_mode:str) -> dict
     Input("search-input","n_submit"),
     prevent_initial_call=True
 )
-def update_graph(search_value: str,n_submit: int):
+def update_graph(search_value: str,n_submit: int) -> dict:
+    """
+    Updates or creates graph with all connecting nodes and edges based on the given search value.
+    :param str search_value: The given search value in the HTML search bar.
+    :param int n_submit: callback input that measures the amount of times the 'enter' key has been used.
+
+    Returns dict: The updated graph with all connecting nodes and edges based on the given search value
+    """
     # Check if the callback was triggered by pressing Enter
     if not ctx.triggered or ctx.triggered[0]['prop_id'] != 'search-input.n_submit':
         # Callback was not triggered by pressing Enter, return empty elements
@@ -382,17 +361,17 @@ def update_graph(search_value: str,n_submit: int):
     filtered_data_edges = []
     filtered_data_nodes = set()
     new_nodes = []
-
+    
+    # Search for a matching edge based on the search value
     for edge in edges_di[int(search_value)]:
         if edge['data']['source'] == search_value or edge['data']['target'] == search_value:
             filtered_data_edges.append(edge)
             filtered_data_nodes.update([edge['data']['source'], edge['data']['target']])
 
+    # Search for a matching node based on the search value
     for node in nodes_di[int(search_value)]:
-
         if node['data']['id'] in filtered_data_nodes:
             new_nodes.append(node)
-
 
     return filtered_data_edges + new_nodes
 
